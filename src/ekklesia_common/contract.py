@@ -77,7 +77,11 @@ class Form(deform.Form):
         def translator(term):
             domain = domains.get(term.domain)
             if domain is None:
-                return term
+                return term.interpolate()
+            else:
+                translated = domain.gettext(term)
+                return term.interpolate(translated)
+
             return domain.gettext(term)
 
         renderer = deform.ZPTRendererFactory(
