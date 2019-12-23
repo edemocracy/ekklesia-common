@@ -79,15 +79,15 @@ def yesno(context, val):
         return _('no')
 
 @contextfilter
-def enum_value(context, val):
+def enum_value(context, instance):
     request = context.get("_request")
     _ = request.i18n.gettext
-    enum_name = case_conversion.snakecase(val.__class__.__name__)
+    enum_name = case_conversion.snakecase(instance.__class__.__name__)
 
-    if val:
-        return _('_'.join([enum_name, val]))
+    if instance:
+        return _('_'.join([enum_name, instance.value]))
     else:
-        return val
+        return instance
 
 
 def markdown(text):
