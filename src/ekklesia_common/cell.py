@@ -5,7 +5,7 @@ from typing import Any, Iterable, Dict, Type, ClassVar
 import case_conversion
 import inspect
 import jinja2
-from ekklesia_portal.helper.utils import cached_property
+from ekklesia_common.utils import cached_property
 from markupsafe import Markup
 
 

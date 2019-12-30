@@ -10,7 +10,6 @@ from morepath.view import render_html
 from deform.widget import Select2Widget, HiddenWidget
 from more.babel_i18n.domain import Domain
 from pkg_resources import resource_filename
-from ekklesia_portal.request import Request
 
 
 def string_property(**kwargs):
@@ -58,8 +57,6 @@ class Schema(colander.MappingSchema):
 
 COLANDER_TRANSLATION_DIR = resource_filename('colander', 'locale/')
 DEFORM_TRANSLATION_DIR = resource_filename('deform', 'locale/')
-EKKLESIA_PORTAL_TRANSLATION_DIR = resource_filename('ekklesia_portal', 'translations/')
-DEFORM_TEMPLATE_DIRS = [resource_filename('ekklesia_portal', 'deform/templates/'), resource_filename('deform', 'templates/')]
 
 
 class Form(deform.Form):
@@ -67,13 +64,14 @@ class Form(deform.Form):
     Deform Form with more.babel_i18n integration.
     """
 
-    def __init__(self, schema: Schema, request: Request, *args, **kwargs) -> None:
+    deform_template_dirs = [resource_filename('deform', 'templates/')]
 
+    def __init__(self, schema: Schema, request: morepath.Request, *args, **kwargs) -> None:
         # Domain depends on request, so it must be created here
         domains = {
             'colander': Domain(request=request, dirname=COLANDER_TRANSLATION_DIR, domain='colander'),
             'deform': Domain(request=request, dirname=DEFORM_TRANSLATION_DIR, domain='deform'),
-            'messages': Domain(request=request, dirname=EKKLESIA_PORTAL_TRANSLATION_DIR, domain='messages')
+            'messages': Domain(request=request, dirname=self.__class__.app_translation_dir, domain='messages')
         }
 
         def translator(term):
@@ -87,11 +85,15 @@ class Form(deform.Form):
             return domain.gettext(term)
 
         renderer = deform.ZPTRendererFactory(
-            DEFORM_TEMPLATE_DIRS,
+            self.__class__.deform_template_dirs,
             translator=translator
         )
         super().__init__(schema, *args, renderer=renderer, **kwargs)
-    
+
+    @classmethod
+    def set_deform_override_dir(cls, dirpath):
+        cls.deform_template_dirs = [dirpath, resource_filename('deform', 'templates/')]
+
     def prepare_for_render(self):
         # Can be used by subclasses to customize field widgets, for example.
         pass

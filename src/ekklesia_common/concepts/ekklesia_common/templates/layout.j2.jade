@@ -1,0 +1,32 @@
+!!! html5
+head
+  - block title
+    title= brand_title
+  meta(charset="utf8")
+
+body
+    .content_area
+      - block content
+        // empty
+
+  - block footer
+
+    footer.footer
+      ul.list-inline
+        li.list-inline-item(hidden=(custom_footer_url is none))
+          a(href=custom_footer_url)= _("link_other")
+        li.list-inline-item(hidden=(custom_footer_url is none))
+          a(href=faq_url)= _("faq")
+        li.list-inline-item(hidden=(tos_url is none))
+          a(href=tos_url)= _("terms_of_use")
+        li.list-inline-item(hidden=(imprint_url is none))
+          a(href=imprint_url)= _("imprint")
+        li.list-inline-item
+          a(href=source_code_url)= _("source code")
+
+  - block script
+    // empty
+
+
+// generated from jade
+//- vim: set filetype=jade sw=2 ts=2 sts=2 expandtab:

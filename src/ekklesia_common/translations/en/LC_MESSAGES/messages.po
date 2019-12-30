@@ -1,0 +1,66 @@
+# English translations for PROJECT.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-12-30 10:35+0000\n"
+"PO-Revision-Date: 2015-09-06 22:42+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/index.j2.jade:3
+msgid "warning_development_mode"
+msgstr "Warning: insecure development mode. Login without password possible!"
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:13
+msgid "link_other"
+msgstr "Go to current voting"
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:15
+msgid "faq"
+msgstr "FAQ"
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:17
+msgid "terms_of_use"
+msgstr "Terms of Use"
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:19
+msgid "imprint"
+msgstr "Imprint"
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:21
+msgid "source code"
+msgstr "source code"
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/page_test.j2.jade:11
+msgid "hello_date"
+msgstr "hello, today is %(date)s and the time is %(time)s."
+
+#: src/ekklesia_common/concepts/ekklesia_common/templates/page_test.j2.jade:13
+#: src/ekklesia_common/concepts/ekklesia_common/templates/page_test.j2.jade:15
+msgid "hello"
+msgid_plural "hellos"
+msgstr[0] "Hello"
+msgstr[1] "Hellos"
+
+#: src/ekklesia_common/templating.py:77
+msgid "yes"
+msgstr "yes"
+
+#: src/ekklesia_common/templating.py:79
+msgid "no"
+msgstr "no"
+
+#: src/ekklesia_common/templating.py:88
+msgid "_"
+msgstr ""

@@ -11,7 +11,7 @@ from pyjade.utils import process
 from werkzeug.datastructures import ImmutableDict
 from jinja2.filters import contextfilter
 from jinja2 import Undefined, PackageLoader, ChoiceLoader, PrefixLoader
-import ekklesia_portal.helper.markdown as md
+from ekklesia_common import md
 
 
 class JinjaAutoescapeCompiler(JinjaCompiler):
