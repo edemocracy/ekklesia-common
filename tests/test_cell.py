@@ -2,10 +2,10 @@ import inspect
 from unittest.mock import Mock
 from munch import Munch
 from pytest import fixture, raises
-import ekklesia_portal.helper.cell
-from ekklesia_portal.helper.cell import Cell, JinjaCellEnvironment
-from ekklesia_portal.app import make_jinja_env
-from ekklesia_portal.request import EkklesiaPortalRequest
+import ekklesia_common.cell
+from ekklesia_common.cell import Cell, JinjaCellEnvironment
+from ekklesia_common.app import make_jinja_env
+from ekklesia_common.request import EkklesiaRequest
 from webob.request import BaseRequest
 
 
@@ -20,7 +20,9 @@ def model():
 @fixture
 def request_for_cell(app):
     environ = BaseRequest.blank('test').environ
-    return Mock(spec=EkklesiaPortalRequest(environ, app))
+    m = Mock(spec=EkklesiaRequest(environ, app))
+    m.i18n = Mock()
+    return m
 
 
 @fixture
@@ -83,7 +85,7 @@ def test_nested_cells(model, cell):
 
 
 def test_cell_is_registrated(cell, model):
-    assert model.__class__ in ekklesia_portal.helper.cell._cell_registry
+    assert model.__class__ in ekklesia_common.cell._cell_registry
 
 
 def test_cell_cell(cell, model):
