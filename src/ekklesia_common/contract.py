@@ -71,7 +71,7 @@ class Form(deform.Form):
         domains = {
             'colander': Domain(request=request, dirname=COLANDER_TRANSLATION_DIR, domain='colander'),
             'deform': Domain(request=request, dirname=DEFORM_TRANSLATION_DIR, domain='deform'),
-            'messages': Domain(request=request, dirname=self.__class__.app_translation_dir, domain='messages')
+            'messages': Domain(request=request, dirname=request.app.translation_dir, domain='messages')
         }
 
         def translator(term):

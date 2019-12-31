@@ -57,12 +57,12 @@ def cell_class(model):
         def test_url(self):
             return "https://example.com/test"
 
-        @Cell.view
-        def alternate_view(self, **k):
+        @Cell.fragment
+        def alternate_fragment(self, **k):
             return self.render_template('alternate_template', **k)
 
-        @Cell.view
-        def view_without_params(self):
+        @Cell.fragment
+        def fragment_without_params(self):
             pass
 
     return TestCell
@@ -100,12 +100,12 @@ def test_cell_getattr(cell, model):
 
 def test_cell_automatic_properties(cell):
     assert cell.test_url == 'https://example.com/test'
-    assert inspect.ismethod(cell.alternate_view)
-    assert inspect.ismethod(cell.view_without_params)
+    assert inspect.ismethod(cell.alternate_fragment)
+    assert inspect.ismethod(cell.fragment_without_params)
 
 
-def test_cell_view_methods(cell):
-    assert cell.alternate_view._view
+def test_cell_fragment_methods(cell):
+    assert cell.alternate_fragment._fragment
 
 
 def test_cell_getitem(cell, model):
@@ -160,8 +160,8 @@ def test_cell_render_cell(cell, model, request_for_cell):
     assert request_for_cell.render_template.call_args[0][0] == cell.template_path
 
 
-def test_cell_render_cell_nonstandard_view(cell, model, request_for_cell):
-    cell.render_cell(model, 'alternate_view', some_option=42)
+def test_cell_render_cell_fragment(cell, model, request_for_cell):
+    cell.render_cell(model, 'alternate_fragment', some_option=42)
     request_for_cell.render_template.assert_called
     assert request_for_cell.render_template.call_args[0][0] == 'alternate_template'
 

@@ -40,7 +40,7 @@ class CellMeta(type):
             for k, v in dct.items():
                 if (not k.startswith('_')
                         and inspect.isfunction(v)
-                        and not hasattr(v, '_view')
+                        and not hasattr(v, '_fragment')
                         and len(inspect.signature(v).parameters) == 1):
                     # turn functions with single argument (self) into cached properties
                     dct[k] = cached_property(v)
@@ -154,10 +154,11 @@ class Cell(metaclass=CellMeta):
             return getattr(self.cell(model, layout=layout, **options), view_method)()
 
     @staticmethod
-    def view(func):
-        """Decorator for cell methods that can be used as alternative views.
+    def fragment(func):
+        """Decorator for cell methods that provide additional HTML.
+        This can be used for template fragmentation or alternative presentation of the same concept.
         """
-        func._view = True
+        func._fragment = True
         return func
 
     @cached_property
