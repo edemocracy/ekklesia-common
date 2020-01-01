@@ -65,6 +65,8 @@ def cell_class(model):
         def fragment_without_params(self):
             pass
 
+        fragment_from_name = Cell.fragment('name')
+
     return TestCell
 
 
@@ -98,14 +100,31 @@ def test_cell_getattr(cell, model):
     assert cell.title == model.title
 
 
-def test_cell_automatic_properties(cell):
+def test_cell_automatic_property_from_no_arg_method(cell):
     assert cell.test_url == 'https://example.com/test'
+
+
+def test_cell_fragment_methods_are_not_properties(cell):
+    # Fragment methods should not be turned into properties
     assert inspect.ismethod(cell.alternate_fragment)
     assert inspect.ismethod(cell.fragment_without_params)
 
 
-def test_cell_fragment_methods(cell):
+def test_cell_fragment_method_has_marker(cell):
     assert cell.alternate_fragment._fragment
+
+
+def test_fragment_from_name_with_prefix(cell):
+    cell.template_prefix = 'templates'
+    cell.render_template = Mock()
+    cell.fragment_from_name()
+    cell.render_template.assert_called_with('templates/name.j2.jade')
+
+
+def test_fragment_from_name_without_prefix(cell):
+    cell.render_template = Mock()
+    cell.fragment_from_name()
+    cell.render_template.assert_called_with('name.j2.jade')
 
 
 def test_cell_getitem(cell, model):

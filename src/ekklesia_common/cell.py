@@ -1,4 +1,5 @@
 from __future__ import annotations
+import inspect
 import os.path
 from webob import Request
 from typing import Any, Iterable, Dict, Type, ClassVar
@@ -153,13 +154,34 @@ class Cell(metaclass=CellMeta):
         else:
             return getattr(self.cell(model, layout=layout, **options), view_method)()
 
-    @staticmethod
-    def fragment(func):
+    @classmethod
+    def fragment(cls, func_or_name):
         """Decorator for cell methods that provide additional HTML.
-        This can be used for template fragmentation or alternative presentation of the same concept.
+        This can be used for template fragmentation or alternative presentation
+        of the same concept.
+        Can be called with a string argument as a shortcut for creating a
+        fragment method based on conventions:
+
+        `fragment = Cell.fragment('name')`
+        creates a method that renders the template `{template_prefix}/name.j2.jade`
         """
-        func._fragment = True
-        return func
+        if callable(func_or_name):
+            func = func_or_name
+            func._fragment = True
+            return func
+        else:
+            name = func_or_name
+            def fragment_method(self):
+                if self.template_prefix is not None:
+                    template = f'{self.template_prefix}/{name}.j2.jade'
+                else:
+                    template = f'{name}.j2.jade'
+                return self.render_template(template)
+
+            fragment_method._fragment = True
+            fragment_method.__name__ = name
+            return fragment_method
+
 
     @cached_property
     def self_link(self) -> str:
