@@ -10,22 +10,6 @@ from webob.request import BaseRequest
 
 
 @fixture
-def model():
-    class TestModel(Munch):
-        pass
-
-    return TestModel(id=5, title="test", private="secret")
-
-
-@fixture
-def request_for_cell(app):
-    environ = BaseRequest.blank('test').environ
-    m = Mock(spec=EkklesiaRequest(environ, app))
-    m.i18n = Mock()
-    return m
-
-
-@fixture
 def jinja_env(app):
     import jinja2
     template_loader = jinja2.loaders.PackageLoader("tests")

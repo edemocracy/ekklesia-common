@@ -10,6 +10,7 @@ import yaml
 
 from ekklesia_common import database
 from ekklesia_common.cell import JinjaCellEnvironment
+from ekklesia_common.cell_app import CellApp
 from ekklesia_common.concept import ConceptApp
 from ekklesia_common.contract import FormApp
 from ekklesia_common.templating import make_jinja_env, make_template_loader
@@ -20,7 +21,7 @@ from ekklesia_common.request import EkklesiaRequest
 logg = logging.getLogger(__name__)
 
 
-class App(ConceptApp, ForwardedApp, TransactionApp, BabelApp, BrowserSessionApp, FormApp):
+class App(ConceptApp, ForwardedApp, TransactionApp, BabelApp, BrowserSessionApp, FormApp, CellApp):
     request_class = EkklesiaRequest
 
     def __init__(self):

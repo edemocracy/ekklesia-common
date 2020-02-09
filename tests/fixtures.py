@@ -1,5 +1,7 @@
 import logging
+from unittest.mock import Mock
 import os.path
+from munch import Munch
 from pytest import fixture
 from morepath.request import BaseRequest
 import morepath
@@ -21,3 +23,21 @@ def app():
 def req(app):
     environ = BaseRequest.blank('test').environ
     return EkklesiaRequest(environ, app)
+
+
+@fixture
+def request_for_cell(app):
+    environ = BaseRequest.blank('test').environ
+    m = Mock(spec=EkklesiaRequest(environ, app))
+    m.app = app
+    m.i18n = Mock()
+    return m
+
+
+@fixture
+def model():
+    class TestModel(Munch):
+        pass
+
+    return TestModel(id=5, title="test", private="secret")
+
