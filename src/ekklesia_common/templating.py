@@ -85,7 +85,7 @@ def enum_value(context, instance):
     enum_name = case_conversion.snakecase(instance.__class__.__name__)
 
     if instance:
-        return _('_'.join([enum_name, instance.value]))
+        return _(enum_name + "_" + case_conversion.snakecase(instance.value))
     else:
         return instance
 
