@@ -1,5 +1,6 @@
 from functools import wraps
 from itertools import tee
+import json
 import colander
 import dectate
 import deform
@@ -10,6 +11,67 @@ from morepath.view import render_html
 from deform.widget import Select2Widget, HiddenWidget
 from more.babel_i18n.domain import Domain
 from pkg_resources import resource_filename
+
+
+class JSONObject(colander.SchemaType):
+
+    def __init__(self, allow_empty=False):
+        self.allow_empty = allow_empty
+
+    def serialize(self, node, appstruct):
+        if appstruct is colander.null:
+            return colander.null
+
+        try:
+            result = json.dumps(appstruct)
+        except Exception as e:
+            raise colander.Invalid(
+                node,
+                colander._(
+                    '${val} cannot be JSON-serialized: ${err}',
+                    mapping={'val': appstruct, 'err': e},
+                ),
+            )
+
+        if not result.startswith('{'):
+            raise colander.Invalid(
+                node,
+                colander._(
+                    '${val} does not serialize to a JSON object',
+                    mapping={'val': appstruct}
+                )
+            )
+
+        return result
+
+
+    def deserialize(self, node, cstruct):
+        if cstruct == '' and self.allow_empty:
+            return {}
+
+        if not cstruct:
+            return colander.null
+
+        if not cstruct.startswith('{'):
+            raise colander.Invalid(
+                node,
+                colander._(
+                    '${val} does not represent a JSON object',
+                    mapping={'val': cstruct}
+                )
+            )
+        try:
+            result = json.loads(cstruct)
+        except json.JSONDecodeError as e:
+            raise Invalid(
+                node,
+                colander._(
+                    '${val} is not a JSON object: ${err}',
+                    mapping={'val': cstruct}
+                )
+            )
+
+        return result
 
 
 def string_property(**kwargs):
@@ -43,12 +105,17 @@ def date_property(**kwargs):
 def datetime_property(**kwargs):
     return colander.SchemaNode(colander.DateTime(), **kwargs)
 
+
 def enum_property(enum_cls, **kwargs):
     return colander.SchemaNode(colander.Enum(enum_cls), **kwargs)
 
 
 def datetime_property(**kwargs):
     return colander.SchemaNode(colander.DateTime(), **kwargs)
+
+
+def json_property(**kwargs):
+    return colander.SchemaNode(JSONObject(), **kwargs)
 
 
 class Schema(colander.MappingSchema):
