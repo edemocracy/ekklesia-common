@@ -4,6 +4,11 @@ from mdx_gfm import GithubFlavoredMarkdownExtension
 
 MARKDOWN_EXTENSIONS = [GithubFlavoredMarkdownExtension()]
 
-md = Markdown(extensions=MARKDOWN_EXTENSIONS)
 
-convert = md.convert
+def markdown():
+    return Markdown(extensions=MARKDOWN_EXTENSIONS)
+
+
+def convert(text):
+    md = markdown()
+    return md.convert(text)
