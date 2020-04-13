@@ -206,6 +206,21 @@ class Cell(metaclass=CellMeta):
 
     # magic starts here...
 
+    def __getattribute__(self, name):
+        """
+        Fixes the problem that AttributeErrors thrown by properties are invisible.
+        AttributeError in this method causes __getattr__ to be called which
+        produces a misleading error. We have to convert the exception to pass it on.
+        """
+        try:
+            ret = object.__getattribute__(self, name)
+        except AttributeError as e:
+            if hasattr(self.__class__, name):
+                raise RuntimeError(e)
+            raise
+
+        return ret
+
     def __getattr__(self, name):
         if name in self.model_properties:
             return getattr(self._model, name)
