@@ -166,8 +166,8 @@ class Form(deform.Form):
         pass
 
 
-def get_form_data(model, form_class, cell_class, request):
-    form = form_class(request, request.link(model))
+def get_form_data(model, form_class, cell_class, view_name, request):
+    form = form_class(request, request.link(model, name='+' + view_name))
     controls = list(request.POST.items())
     with start_action(action_type='validate_form',
                     controls=dict(c for c in controls if not c[0].startswith('_')),
@@ -198,6 +198,8 @@ class HtmlFormAction(HtmlAction):
     def __init__(self, model, form, cell, render=None, template=None, load=None, permission=None, internal=False, **predicates):
         self.form = form
         self.cell = cell
+        self.view_name = predicates.get('name', '')
+
         if 'request_method' not in predicates:
             predicates['request_method'] = 'POST'
 
@@ -208,11 +210,12 @@ class HtmlFormAction(HtmlAction):
         form_class = self.form
         model_class = self.model
         cell_class = self.cell
+        view_name = self.view_name
 
         @log_call
         @wraps(obj)
         def wrapped(self, request):
-            appstruct, failure_response = get_form_data(self, form_class, cell_class, request)
+            appstruct, failure_response = get_form_data(self, form_class, cell_class, view_name, request)
 
             if failure_response:
                 return failure_response
