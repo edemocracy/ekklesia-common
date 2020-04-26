@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import dataclasses
 from dataclasses import dataclass
 from functools import partial
 from typing import List, NewType
@@ -21,35 +22,21 @@ class EkklesiaNotAuthorized(Exception):
     pass
 
 
-@dataclass
-class EkklesiaProfileData:
-    username: str
-    avatar: str = ''
-    profile: str = ''
-
-
 AUID = NewType('AUID', str)
 
 
 @dataclass
-class EkklesiaAUIDData:
+class EkklesiaAuthData:
     auid: AUID
-
-
-@dataclass
-class EkklesiaMembershipData:
-    nested_groups: List[int]
-    all_nested_groups: List[int]
-    type: EkklesiaUserType
+    preferred_username: str
+    roles: List[str]
+    eligible: bool
     verified: bool
 
-
-@dataclass
-class EkklesiaAuthData:
-    auid: EkklesiaAUIDData
-    profile: EkklesiaProfileData
-    membership: EkklesiaMembershipData
-    token: str = ''
+    @classmethod
+    def from_dict(cls, dict_) -> 'EkklesiaAuthData':
+        class_fields = {f.name for f in dataclasses.fields(cls)}
+        return EkklesiaAuthData(**{k: v for k, v in dict_.items() if k in class_fields})
 
 
 class EkklesiaAuth:
@@ -89,30 +76,14 @@ class EkklesiaAuth:
     def authorized(self):
         return self.token is not None
 
-    def api_request(self, method, path, **kwargs):
-        url = urljoin(self.settings.api_base_url, path)
-        res = self.session.request(method, url, **kwargs)
+    @property
+    def userinfo(self) -> dict:
+        res = self.session.get(self.settings.userinfo_url)
         return res.json()
 
     @property
-    def profile(self) -> EkklesiaProfileData:
-        res = self.api_request('GET', 'user/profile')
-        return EkklesiaProfileData(**res)
-
-    @property
-    def auid(self) -> EkklesiaAUIDData:
-        res = self.api_request('GET', 'user/auid')
-        return EkklesiaAUIDData(**res)
-
-    @property
-    def membership(self) -> EkklesiaMembershipData:
-        res = self.api_request('GET', 'user/membership')
-        res['type'] = EkklesiaUserType(res['type'])
-        return EkklesiaMembershipData(**res)
-
-    @property
     def data(self) -> EkklesiaAuthData:
-        return EkklesiaAuthData(profile=self.profile, auid=self.auid, membership=self.membership)
+        return EkklesiaAuthData.from_dict(self.userinfo)
 
 
 class GetOAuthTokenAction(dectate.Action):
@@ -182,9 +153,9 @@ def ekklesia_auth_setting_section():
     return {
         'client_id': 'ekklesia_portal',
         'client_secret': "ekklesia_portal_secret",
-        'api_base_url': "https://identity-server.invalid/api/v1/",
-        'authorization_url': "https://identity-server.invalid/oauth2/authorize/",
-        'token_url': "https://identity-server.invalid/oauth2/token/"
+        'authorization_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/auth",
+        'token_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/token",
+        'userinfo_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/userinfo",
     }
 
 
@@ -213,13 +184,14 @@ def dump_ekklesia_auth_data_json(self, _request):
 
 class EkklesiaLogin:
 
-    def __init__(self, settings=None, session=None):
+    def __init__(self, redirect_uri=None, settings=None, session=None):
+        self.redirect_uri = redirect_uri
         self.settings = settings
         self.session = session
 
     @cached_property
     def oauth(self):
-        return OAuth2Session(client_id=self.settings.client_id)
+        return OAuth2Session(client_id=self.settings.client_id, redirect_uri=self.redirect_uri)
 
     def get_authorization_url(self):
         authorization_url, state = self.oauth.authorization_url(self.settings.authorization_url)
@@ -229,7 +201,8 @@ class EkklesiaLogin:
 
 @EkklesiaAuthPathApp.path(model=EkklesiaLogin, path="/login")
 def oauth_login(request):
-    return EkklesiaLogin(request.app.root.settings.ekklesia_auth, request.browser_session)
+    redirect_uri = request.class_link(OAuthCallback)
+    return EkklesiaLogin(redirect_uri, request.app.root.settings.ekklesia_auth, request.browser_session)
 
 
 @EkklesiaAuthPathApp.view(model=EkklesiaLogin)
