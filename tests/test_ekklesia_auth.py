@@ -14,16 +14,16 @@ from ekklesia_common.ekklesia_auth import EkklesiaAuthApp, EkklesiaAuthPathApp, 
 morepath.autoscan()
 
 CLIENT_ID = 'client_id_test'
-AUTHORIZATION_URL = 'http://id.invalid/oauth2/authorize/'
+AUTHORIZATION_URL = 'http://id.invalid/oauth2/auth/'
 TOKEN_URL = 'http://id.invalid/oauth2/token/'
-API_BASE_URL = "http://id.invalid/api/v1/"
+USERINFO_URL = "http://id.invalid/oauth2/v1/"
 
 EKKLESIAAUTH_SETTINGS = {
     'client_id': CLIENT_ID,
     'client_secret': "test_secret",
-    'api_base_url': API_BASE_URL,
     'authorization_url': AUTHORIZATION_URL,
     'token_url': TOKEN_URL,
+    'userinfo_url': USERINFO_URL
 }
 
 
@@ -182,7 +182,7 @@ def test_not_authorized(app):
 def test_session(app, allow_insecure_transport, fake_request_with_session, token):
     request = fake_request_with_session
     request.browser_session.oauth_token = token
-    req_url = urljoin(API_BASE_URL, 'fake')
+    req_url = USERINFO_URL
     ekklesia_auth = EkklesiaAuth(app.settings.ekklesia_auth, token)
 
     with responses.RequestsMock() as rsps:
@@ -197,7 +197,7 @@ def test_session_token_refresh(app, browser_session, allow_insecure_transport, t
     outdated_token = dict(token, expires_at=token['expires_at'] - 1000, access_token='outdated')
     browser_session.oauth_token = outdated_token
     refreshed_token = dict(token, access_token='refreshed')
-    req_url = urljoin(API_BASE_URL, 'fake')
+    req_url = USERINFO_URL
 
     def set_token(token):
         browser_session['oauth_token'] = token
@@ -219,21 +219,16 @@ def test_oauth_dance(app, client, browser_session, token):
     state = browser_session['oauth_state']
 
     with responses.RequestsMock() as rsps:
-        auid = {'auid': 'auid_egon'}
-        profile = {'avatar': False, 'username': 'test', 'profile': 'profile'}
-        membership = {
-            'all_nested_groups': [1, 2],
-            'nested_groups': [1, 2],
-            'type': 'system user',
-            'verified': False
+        userinfo = {
+            'preferred_username': 'egon',
+            'auid': 'auid_egon',
+            'roles': ['LV Bayern', 'BV'],
+            'eligible': True,
+            'verified': True
         }
-        rsps.add(responses.GET, urljoin(API_BASE_URL, 'user/profile'), body=json.dumps(profile))  # @UndefinedVariable
-        rsps.add(responses.GET, urljoin(API_BASE_URL, 'user/auid'), body=json.dumps(auid))  # @UndefinedVariable
-        rsps.add(responses.GET, urljoin(API_BASE_URL, 'user/membership'), body=json.dumps(membership))  # @UndefinedVariable
+        rsps.add(responses.GET, USERINFO_URL, body=json.dumps(userinfo))  # @UndefinedVariable
         rsps.add(responses.POST, TOKEN_URL, body=json.dumps(token))  # @UndefinedVariable
 
         client.get(f'/ekklesia_auth/callback?code=deadbeef&state={state}', status=302)
         res = client.get('/ekklesia_auth/info')
-        assert res.json['auid'] == auid
-        assert res.json['profile'] == profile
-        assert res.json['membership'] == membership
+        assert res.json == userinfo
