@@ -1,6 +1,6 @@
 { pkgs, python }:
 
-with pkgs.python37Packages;
+with pkgs.python38Packages;
 
 let
   addBuiltInputs = packageName: inputs:
@@ -16,20 +16,12 @@ self: super: {
 
   "setuptools-scm" = setuptools_scm;
 
-  "importlib-metadata" = python.overrideDerivation super."importlib-metadata" (old: {
-    buildInputs = old.buildInputs ++ [ setuptools_scm ];
-  });
-
   "py" = python.overrideDerivation super."py" (old: {
     buildInputs = old.buildInputs ++ [ setuptools_scm ];
   });
 
   "pytest-mock" = python.overrideDerivation super."pytest-mock" (old: {
     buildInputs = old.buildInputs ++ [ setuptools_scm ];
-  });
-
-  "zipp" = python.overrideDerivation super."zipp" (old: {
-    buildInputs = old.buildInputs ++ [ pytestrunner ];
   });
 
   "faker" = python.overrideDerivation super."faker" (old: {

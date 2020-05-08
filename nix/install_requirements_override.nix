@@ -1,6 +1,6 @@
 { pkgs, python }:
 
-with pkgs.python37Packages;
+with pkgs.python38Packages;
 
 self: super: {
 

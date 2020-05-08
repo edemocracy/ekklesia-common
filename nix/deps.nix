@@ -5,7 +5,6 @@ let
   sources_ = if (sources == null) then import ./sources.nix else sources;
   pkgs = import sources_.nixpkgs { };
   niv = (import sources_.niv { }).niv;
-  bandit = (import ./bandit.nix { inherit pkgs; }).packages.bandit;
   bootstrap = import ./bootstrap.nix { };
   javascriptDeps = import ./javascript_deps.nix { };
   font-awesome = import ./font-awesome.nix { };
@@ -13,7 +12,7 @@ let
   pdbpp = (import ./pdbpp.nix { inherit pkgs; }).packages.pdbpp;
   installPkgs = (import ./install_requirements.nix { inherit pkgs; }).packages;
   testPkgs = (import ./test_requirements.nix { inherit pkgs; }).packages;
-  pythonPackages = pkgs.python37Packages;
+  pythonPackages = pkgs.python38Packages;
   setuptools = pythonPackages.setuptools;
 
 
@@ -22,7 +21,7 @@ in rec {
   inherit (pkgs) lib sassc;
   inherit (installPkgs) babel deform;
   inherit (pythonPackages) buildPythonPackage;
-  buildPythonEnv = pkgs.python37.buildEnv;
+  buildPythonEnv = pkgs.python38.buildEnv;
 
   gunicorn = pythonPackages.gunicorn.overrideAttrs(old: {
     propagatedBuildInputs = [ setuptools ];
@@ -72,7 +71,7 @@ in rec {
     niv
     openssl.dev
     pip
-    postgresql_11
+    postgresql_12
     uwsgi
     sassc
     zsh
