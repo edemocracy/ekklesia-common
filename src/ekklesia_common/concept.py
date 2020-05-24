@@ -1,7 +1,9 @@
 from functools import wraps
 import inspect
+import sys
 import dectate
 from dectate import directive
+from dectate.config import create_code_info
 from eliot import start_action
 import morepath
 
@@ -30,6 +32,10 @@ class ConceptApp(morepath.App):
                  permission=None, internal=False, **predicates):
 
         sup = super().html(model, render, template, load, permission, internal, **predicates)
+
+        frame = sys._getframe(1)
+        code_info = create_code_info(frame)
+        sup.code_info = code_info
 
         def add_log_wrapper(fn):
             argspec = inspect.getargspec(fn)
