@@ -1,0 +1,7 @@
+{
+    "app_package": "Package name for the app, for example ekklesia_portal",
+    "concept_name": "Name of the concept in snake case",
+    "concept_names": "plural name of the concept in snake case",
+    "ConceptName": "name of the concept in pascal case (upper camel case)",
+    "ConceptNames": "plural name of the concept in pascal case (upper camel case)"
+}
