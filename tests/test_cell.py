@@ -34,9 +34,11 @@ def cell_class(model):
     _model = model
 
     class TestCell(Cell):
-        model = _model.__class__
         model_properties = ['id', 'title']
         markup_class = DummyMarkup
+
+        def _get_cell_class(self, model, view):
+            return self.__class__
 
         def test_url(self):
             return "https://example.com/test"
@@ -56,6 +58,7 @@ def cell_class(model):
 
 @fixture
 def cell(cell_class, model, request_for_cell):
+    cell_class.render_template = Mock()
     return cell_class(model, request_for_cell)
 
 
@@ -68,10 +71,6 @@ def test_nested_cells(model, cell):
     child = parent.cell(model)
     assert child.parent == parent
     assert not child.layout
-
-
-def test_cell_is_registrated(cell, model):
-    assert model.__class__ in ekklesia_common.cell._cell_registry
 
 
 def test_cell_cell(cell, model):
@@ -152,28 +151,27 @@ def test_cell_template_path(cell, model):
 
 
 def test_cell_show(cell, model):
-    cell.render_template = Mock()
     cell.show()
     cell.render_template.assert_called_with(cell.template_path)
 
 
-def test_cell_render_cell(cell, model, request_for_cell):
+def test_cell_render_cell(cell, model):
     cell.render_cell(model)
-    request_for_cell.render_template.assert_called
-    assert request_for_cell.render_template.call_args[0][0] == cell.template_path
+    cell.render_template.assert_called
+    assert cell.render_template.call_args[0][0] == cell.template_path
 
 
-def test_cell_render_cell_fragment(cell, model, request_for_cell):
+def test_cell_render_cell_fragment(cell, model):
     cell.render_cell(model, 'alternate_fragment', some_option=42)
-    request_for_cell.render_template.assert_called
-    assert request_for_cell.render_template.call_args[0][0] == 'alternate_template'
+    cell.render_template.assert_called
+    assert cell.render_template.call_args[0][0] == 'alternate_template'
 
 
 def test_cell_render_cell_collection(cell, model):
     model2 = model.copy()
     model2.title = "test2"
     models = [model, model2]
-    cell.cell = Mock(cell)
+    cell.cell = Mock()
     cell.cell.return_value.show = Mock(return_value='test')
     result = cell.render_cell(collection=models, separator='&', some_option=42)
     assert result == 'test&test'
@@ -186,9 +184,9 @@ def test_cell_render_cell_model_and_collection_not_allowed(cell, model):
         cell.render_cell(model, collection=[], some_option=42)
 
 
-def test_cell_jinja_integration(cell, model, render_template, request_for_cell):
-
-    request_for_cell.render_template.side_effect = render_template
+def test_cell_jinja_integration(cell_class, model, render_template, request_for_cell):
+    request_for_cell.render_template = render_template
+    cell = cell_class(model, request_for_cell)
     res = cell.show()
     assert str(model.id) in res.content
     assert model.title in res.content

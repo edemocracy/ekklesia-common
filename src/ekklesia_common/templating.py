@@ -74,9 +74,9 @@ def yesno(context, val):
     _ = request.i18n.gettext
 
     if val:
-        return _('yes')
+        return _('Yes')
     else:
-        return _('no')
+        return _('No')
 
 @contextfilter
 def enum_value(context, instance):

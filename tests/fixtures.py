@@ -5,8 +5,9 @@ from munch import Munch
 from pytest import fixture
 from morepath.request import BaseRequest
 import morepath
-from ekklesia_common.app import make_wsgi_app
+from ekklesia_common.app import EkklesiaApp
 from ekklesia_common.request import EkklesiaRequest
+from types import SimpleNamespace as N
 
 
 BASEDIR = os.path.dirname(__file__)
@@ -15,7 +16,10 @@ logg = logging.getLogger(__name__)
 
 @fixture(scope="session")
 def app():
-    app = make_wsgi_app(testing=True)
+    morepath.autoscan()
+    EkklesiaApp.commit()
+    app = EkklesiaApp()
+    app.babel_init()
     return app
 
 
@@ -27,11 +31,11 @@ def req(app):
 
 @fixture
 def request_for_cell(app):
-    environ = BaseRequest.blank('test').environ
-    m = Mock(spec=EkklesiaRequest(environ, app))
-    m.app = app
-    m.i18n = Mock()
-    return m
+    return N(
+        app=N(settings=N(), get_cell_class=None),
+        current_user=N(),
+        i18n=N(gettext=None),
+        render_template=None)
 
 
 @fixture

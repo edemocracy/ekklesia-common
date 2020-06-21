@@ -1,6 +1,6 @@
 import logging
 import morepath
-from ekklesia_common.database.datamodel import User
+from ekklesia_common.datamodel import User
 
 
 logg = logging.getLogger(__name__)

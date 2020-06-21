@@ -8,10 +8,6 @@ class EkklesiaRequest(morepath.Request):
         super().__init__(*args, **kwargs)
 
     @cached_property
-    def db_session(self):
-        return database.Session()
-
-    @cached_property
     def current_user(self):
         user = self.identity.user
         if user is None:

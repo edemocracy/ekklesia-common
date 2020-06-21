@@ -122,16 +122,20 @@ class Cell(metaclass=CellMeta):
     def static_url(self, path):
         return os.path.join(self._s.static_files.base_url, path)
 
-    def cell(self, model, layout: bool = None, view_name='', **options) -> 'Cell':
-        """Look up a cell by model and create an instance.
-        The parent cell is set to self which also means that it will be rendered without layout by default.
-        """
+    def _get_cell_class(self, model, view_name):
         # multiple new-style cells can be registered for a model class
         cell_class = self._app.get_cell_class(model, view_name)
         # look up old-style cells (only one per model class)
         if cell_class is None:
             cell_class = find_cell_by_model_instance(model)
 
+        return cell_class
+
+    def cell(self, model, layout: bool = None, view_name='', **options) -> 'Cell':
+        """Look up a cell by model and create an instance.
+        The parent cell is set to self which also means that it will be rendered without layout by default.
+        """
+        cell_class = self._get_cell_class(model, view_name)
         return cell_class(model=model, request=self._request, layout=layout, parent=self, **options)
 
     def render_cell(self,

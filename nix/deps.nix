@@ -5,87 +5,80 @@ let
   sources_ = if (sources == null) then import ./sources.nix else sources;
   pkgs = import sources_.nixpkgs { };
   niv = (import sources_.niv { }).niv;
-  bootstrap = import ./bootstrap.nix { };
-  javascriptDeps = import ./javascript_deps.nix { };
-  font-awesome = import ./font-awesome.nix { };
+  cookiecutter = (import ./cookiecutter.nix { inherit pkgs; }).packages.cookiecutter;
   eliotPkgs = (import ./eliot.nix { inherit pkgs; }).packages;
   pdbpp = (import ./pdbpp.nix { inherit pkgs; }).packages.pdbpp;
-  installPkgs = (import ./install_requirements.nix { inherit pkgs; }).packages;
-  testPkgs = (import ./test_requirements.nix { inherit pkgs; }).packages;
-  pythonPackages = pkgs.python38Packages;
-  setuptools = pythonPackages.setuptools;
-
+  inherit ((import "${sources_.poetry2nix}/overlay.nix") pkgs pkgs) poetry2nix poetry;
+  python = pkgs.python38;
+  overrides = poetry2nix.overrides.withDefaults (
+    self: super: {
+      munch = super.munch.overridePythonAttrs (
+        old: {
+          propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.pbr self.setuptools ];
+        }
+      );
+    });
 
 in rec {
-  inherit pkgs bootstrap javascriptDeps;
-  inherit (pkgs) lib sassc;
-  inherit (installPkgs) babel deform;
-  inherit (pythonPackages) buildPythonPackage;
-  buildPythonEnv = pkgs.python38.buildEnv;
+  inherit pkgs python;
+  inherit (pkgs) lib glibcLocales;
 
-  gunicorn = pythonPackages.gunicorn.overrideAttrs(old: {
-    propagatedBuildInputs = [ setuptools ];
-  });
+  mkPoetryApplication = { ... }@args:
+    poetry2nix.mkPoetryApplication args // {
+      inherit overrides;
+    };
+
+  inherit (poetry2nix.mkPoetryPackages {
+    projectDir = ../.;
+    inherit python;
+    inherit overrides;
+  }) poetryPackages pyProject;
 
   # Can be imported in Python code or run directly as debug tools
-  debugLibsAndTools = with pythonPackages; [
-    ipython
+  debugLibsAndTools = [
+    python.pkgs.ipython
     pdbpp
   ];
 
-  testLibs = (attrValues testPkgs) ++ [ setuptools ];
-
-  installLibs = (attrValues installPkgs) ++ [
-    eliotPkgs.eliot
+  devLibs = [
+    cookiecutter
   ];
 
-  python = buildPythonEnv.override {
-    extraLibs = installLibs;
+  pythonEnv = python.buildEnv.override {
+    extraLibs =
+      poetryPackages ++
+      debugLibsAndTools ++
+      devLibs;
     ignoreCollisions = true;
   };
-
-  pythonTest = buildPythonEnv.override {
-    extraLibs = testLibs ++
-                installLibs ++
-                debugLibsAndTools;
-    ignoreCollisions = true;
-  };
-
-  pythonDev = pythonTest;
 
   # Code style and security tools
-  linters = with pythonPackages; [
+  linters = with python.pkgs; [
     bandit
     mypy
     pylama
     pylint
     autopep8
+    yapf
   ];
 
   # Various tools for log files, deps management, running scripts and so on
-  shellTools = with pkgs; with pythonPackages; [
+  shellTools = [
     eliotPkgs.eliot-tree
-    entr
-    gunicorn
-    jq
     niv
-    openssl.dev
-    pip
-    postgresql_12
-    uwsgi
-    sassc
-    zsh
+    pkgs.entr
+    pkgs.jq
+    pkgs.zsh
+    python.pkgs.poetry
   ];
 
   # Needed for a development nix shell
   shellInputs =
-    [ pythonTest bootstrap ] ++
     linters ++
     shellTools ++
-    debugLibsAndTools;
+    debugLibsAndTools ++ [
+      pythonEnv
+    ];
 
   shellPath = lib.makeBinPath shellInputs;
-  sassPath = "${bootstrap}/scss:${font-awesome}/scss";
-  jsPath = "${javascriptDeps}/js";
-  webfontsPath = "${font-awesome}/webfonts";
 }

@@ -21,3 +21,5 @@ result
 .coverage
 htmlcov/
 mypy_stubs
+pyenv
+pip-wheel-metadata

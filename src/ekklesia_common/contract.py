@@ -194,7 +194,6 @@ def select2_widget_or_hidden(values):
 class HtmlFormAction(HtmlAction):
     group_class = ViewAction
 
-    @log_call
     def __init__(self, model, form, cell, render=None, template=None, load=None, permission=None, internal=False, **predicates):
         self.form = form
         self.cell = cell
@@ -205,7 +204,6 @@ class HtmlFormAction(HtmlAction):
 
         super().__init__(model, render or render_html, template, load, permission, internal, **predicates)
 
-    @log_call
     def perform(self, obj, template_engine_registry, app_class):
         form_class = self.form
         model_class = self.model
