@@ -58,7 +58,6 @@ in rec {
     mypy
     pylama
     pylint
-    autopep8
     yapf
   ];
 
@@ -69,7 +68,7 @@ in rec {
     pkgs.entr
     pkgs.jq
     pkgs.zsh
-    python.pkgs.poetry
+    poetry
   ];
 
   # Needed for a development nix shell
