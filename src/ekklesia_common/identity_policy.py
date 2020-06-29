@@ -15,7 +15,7 @@ class UserIdentity(morepath.Identity):
         return self.user.id
 
 
-class NoIdentity(morepath.Identity):
+class NoIdentity:
     user = None
     userid = None
 
