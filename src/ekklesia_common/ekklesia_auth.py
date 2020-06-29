@@ -162,6 +162,7 @@ class EkklesiaAuthApp(App):
 @EkklesiaAuthApp.setting_section(section='ekklesia_auth')
 def ekklesia_auth_setting_section():
     return {
+        'enabled': False,
         'client_id': 'ekklesia_portal',
         'client_secret': "ekklesia_portal_secret",
         'authorization_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/auth",
