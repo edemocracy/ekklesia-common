@@ -290,6 +290,37 @@ werkzeug = ">=0.9"
 
 [[package]]
 category = "main"
+description = "Forwarded header support for Morepath"
+name = "more.forwarded"
+optional = false
+python-versions = "*"
+version = "0.2"
+
+[package.dependencies]
+morepath = ">0.13.2"
+setuptools = "*"
+
+[package.extras]
+test = ["pytest (>=2.0)", "pytest-cov", "WebTest (>=2.0.14)"]
+
+[[package]]
+category = "main"
+description = "transaction integration for Morepath"
+name = "more.transaction"
+optional = false
+python-versions = "*"
+version = "0.9"
+
+[package.dependencies]
+morepath = ">=0.15"
+setuptools = "*"
+transaction = ">=2.4.0"
+
+[package.extras]
+test = ["coverage", "pytest (>=2.6.0)", "pytest-cov", "webtest"]
+
+[[package]]
+category = "main"
 description = "A micro web-framework with superpowers"
 name = "morepath"
 optional = false
@@ -782,7 +813,7 @@ transaction = ">=1.6.0"
 test = ["zope.testing"]
 
 [metadata]
-content-hash = "ddb4a2b8fb15103f4acb8ce364889891444e761dc485d886fed715e308c07cdc"
+content-hash = "9f408364501643adc49f2a69b22f1805b32f15723240254ef755c0a2cf0dde73"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -944,6 +975,12 @@ more-itertools = [
 "more.browser-session" = [
     {file = "more.browser_session-19.8.0-py3-none-any.whl", hash = "sha256:2dd6723a33657eaca8ac50c691052ce6cf1b8aa779023156ca0361a4807ed240"},
     {file = "more.browser_session-19.8.0.tar.gz", hash = "sha256:80ebd95865a1270687d5bbb9f2dc3b6e7fe27f06a2711515278b74b534cfef55"},
+]
+"more.forwarded" = [
+    {file = "more.forwarded-0.2.tar.gz", hash = "sha256:d6e89b4990dc98fe4476d1dea3c49506a3434d5fc8118d48afaeecfcaa0595c3"},
+]
+"more.transaction" = [
+    {file = "more.transaction-0.9.tar.gz", hash = "sha256:b5ce7d11e6c71bb3b8b6eee060d25433e4ff7c377b5d42693d0be14a7a856ce6"},
 ]
 morepath = [
     {file = "morepath-0.19-py2.py3-none-any.whl", hash = "sha256:ae6787f3fed573146b3496fbd158bf2a938088f41eb5ba67f56a541c6f785b19"},

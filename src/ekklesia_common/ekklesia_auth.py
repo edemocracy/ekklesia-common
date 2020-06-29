@@ -183,7 +183,7 @@ def make_ekklesia_auth_tween(app, handler):
 
 class EkklesiaAuthPathApp(App):
     """Provides paths for getting OAuth2 authorization ("login") and info.
-    Should be mounted under a App subclassing `EkklesiaApp`.
+    Should be mounted under a App subclassing `EkklesiaBrowserApp`.
     """
     pass
 

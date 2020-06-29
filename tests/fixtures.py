@@ -5,7 +5,7 @@ from munch import Munch
 from pytest import fixture
 from morepath.request import BaseRequest
 import morepath
-from ekklesia_common.app import EkklesiaApp
+from ekklesia_common.app import EkklesiaBrowserApp
 from ekklesia_common.request import EkklesiaRequest
 from types import SimpleNamespace as N
 
@@ -17,8 +17,8 @@ logg = logging.getLogger(__name__)
 @fixture(scope="session")
 def app():
     morepath.autoscan()
-    EkklesiaApp.commit()
-    app = EkklesiaApp()
+    EkklesiaBrowserApp.commit()
+    app = EkklesiaBrowserApp()
     app.babel_init()
     return app
 

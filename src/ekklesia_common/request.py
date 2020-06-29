@@ -1,11 +1,16 @@
 import morepath
 from ekklesia_common.utils import cached_property
-from ekklesia_common.database import Session
+from ekklesia_common import database
+
 
 class EkklesiaRequest(morepath.Request):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    @cached_property
+    def db_session(self):
+        return database.Session()
 
     @cached_property
     def current_user(self):
