@@ -1,7 +1,9 @@
 import logging
 import os
 from pkg_resources import resource_filename
+import secrets
 
+from eliot import start_task
 import morepath
 from more.babel_i18n import BabelApp
 from more.browser_session import BrowserSessionApp
@@ -37,6 +39,61 @@ class EkklesiaBrowserApp(BabelApp, BrowserSessionApp, CellApp, ConceptApp, Ekkle
         self.jinja_env = make_jinja_env(jinja_environment_class=JinjaCellEnvironment,
                                         jinja_options=dict(loader=template_loader),
                                         app=self)
+
+
+@EkklesiaBrowserApp.setting_section(section="browser_session")
+def browser_session_setting_section():
+    return {
+        "secret_key": secrets.token_urlsafe(64),
+        "cookie_secure": True
+    }
+
+
+@EkklesiaBrowserApp.setting_section(section='common')
+def common_setting_section():
+    """Various settings that can be used by ekklesia-common code."""
+    return {
+        "fail_on_form_validation_error": False,
+        "force_ssl": False,
+        "instance_name": "ekklesia_app"
+    }
+
+
+@EkklesiaBrowserApp.setting_section(section="static_files")
+def static_files_setting_section():
+    return {
+        "base_url": "/static"
+    }
+
+
+@EkklesiaBrowserApp.tween_factory()
+def make_ekklesia_log_tween(app, handler):
+    def ekklesia_log_tween(request):
+        request_data = {
+            'url': request.url,
+            'headers': dict(request.headers)
+        }
+
+        user = request.current_user
+
+        if user is not None:
+            request_data['user'] = user.id
+
+        with start_task(action_type='request', request=request_data):
+            return handler(request)
+
+    return ekklesia_log_tween
+
+
+@EkklesiaBrowserApp.tween_factory()
+def make_ekklesia_customizations_tween(app, handler):
+    def ekklesia_customizations_tween(request):
+        if app.settings.common.force_ssl:
+            request.scheme = 'https'
+
+        return handler(request)
+
+    return ekklesia_customizations_tween
 
 
 def get_locale(request):

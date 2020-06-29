@@ -176,7 +176,7 @@ def get_form_data(model, form_class, cell_class, view_name, request):
             return form.validate(controls), None
         except deform.ValidationFailure:
             Message.log(validation_errors=form.error.asdict())
-            if request.app.settings.app.fail_on_form_validation_error:
+            if request.app.settings.common.fail_on_form_validation_error:
                 raise form.error
             return None, cell_class(request=request, form=form, model=model).show()
 
