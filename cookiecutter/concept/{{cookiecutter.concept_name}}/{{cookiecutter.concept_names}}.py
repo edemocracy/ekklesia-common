@@ -1,4 +1,4 @@
-from {{ cookiecutter.app_package }}.database.datamodel import {{ cookiecutter.ConceptName }}
+from {{ cookiecutter.app_package }}.datamodel import {{ cookiecutter.ConceptName }}
 
 
 class {{ cookiecutter.ConceptNames }}:

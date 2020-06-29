@@ -1,7 +1,7 @@
 import factory
 from webtest_helpers import assert_deform, fill_form
 from assert_helpers import assert_difference, assert_no_difference
-from {{ cookiecutter.app_package }}.database.datamodel import {{ cookiecutter.ConceptName }}
+from {{ cookiecutter.app_package }}.datamodel import {{ cookiecutter.ConceptName }}
 
 
 def test_create_{{ cookiecutter.concept_name }}(client, db_query, {{ cookiecutter.concept_name }}_factory):

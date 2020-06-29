@@ -10,8 +10,10 @@ import dectate
 from eliot import start_task
 from morepath import App, redirect
 from requests_oauthlib import OAuth2Session
+from sqlalchemy import Integer, Text, DateTime, func, JSON
 from webob.exc import HTTPForbidden
 
+from ekklesia_common.database import Base, C, rel, bref, FK
 from ekklesia_common.enums import EkklesiaUserType
 from ekklesia_common.utils import cached_property
 
@@ -23,6 +25,15 @@ class EkklesiaNotAuthorized(Exception):
 
 
 AUID = NewType('AUID', str)
+
+
+class OAuthToken(Base):
+    __tablename__ = 'oauth_token'
+    id = C(Integer, FK('users.id'), primary_key=True)
+    user = rel("User", backref=bref("oauth_token", uselist=False))
+    token = C(JSON)
+    provider = C(Text)
+    created_at = C(DateTime, nullable=False, server_default=func.now())
 
 
 @dataclass

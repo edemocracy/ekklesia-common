@@ -1,7 +1,7 @@
 from morepath import redirect
 #from webob.exc import HTTPBadRequest
 from {{ cookiecutter.app_package }}.app import App
-from {{ cookiecutter.app_package }}.database.datamodel import {{ cookiecutter.ConceptName }}
+from {{ cookiecutter.app_package }}.datamodel import {{ cookiecutter.ConceptName }}
 from {{ cookiecutter.app_package }}.permission import CreatePermission, EditPermission
 from .{{ cookiecutter.concept_name }}_cells import {{ cookiecutter.ConceptName }}Cell, {{ cookiecutter.ConceptNames }}Cell, New{{ cookiecutter.ConceptName }}Cell, Edit{{ cookiecutter.ConceptName }}Cell
 from .{{ cookiecutter.concept_name }}_contracts import {{ cookiecutter.ConceptName }}Form

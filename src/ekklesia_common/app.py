@@ -12,7 +12,6 @@ from ekklesia_common.cell_app import CellApp
 from ekklesia_common.concept import ConceptApp
 from ekklesia_common.contract import FormApp
 from ekklesia_common.templating import make_jinja_env, make_template_loader
-from ekklesia_common.identity_policy import EkklesiaIdentityPolicy
 from ekklesia_common.request import EkklesiaRequest
 
 

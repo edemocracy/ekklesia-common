@@ -1,7 +1,7 @@
 from {{ cookiecutter.app_package }}.app import App
 from {{ cookiecutter.app_package }}.concepts.{{ cookiecutter.app_package }}.cell.layout import LayoutCell
 from {{ cookiecutter.app_package }}.concepts.{{ cookiecutter.app_package }}.cell.form import NewFormCell, EditFormCell
-from {{ cookiecutter.app_package }}.database.datamodel import {{ cookiecutter.ConceptName }}
+from {{ cookiecutter.app_package }}.datamodel import {{ cookiecutter.ConceptName }}
 from {{ cookiecutter.app_package }}.permission import CreatePermission, EditPermission
 #from .{{ cookiecutter.concept_name }}_helper import items_for_{{cookiecutter.concept_name}}_select_widgets
 from .{{ cookiecutter.concept_names }} import {{ cookiecutter.ConceptNames }}
