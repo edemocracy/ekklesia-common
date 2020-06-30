@@ -5,6 +5,7 @@
 .idea
 *.pot
 *.mo
+dist
 .babelcompiled
 src/ekklesia_common.egg-info/
 .cache/
