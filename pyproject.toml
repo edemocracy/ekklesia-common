@@ -31,6 +31,7 @@ py-gfm = "^0.1.4"
 requests_oauthlib = "^1.3.0"
 "zope.sqlalchemy" = "^1.3"
 case-conversion = "^2.1.0"
+inflection = "^0.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.2"

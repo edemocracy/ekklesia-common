@@ -10,7 +10,7 @@ from pathlib import Path
 from pkg_resources import resource_filename
 import sys
 import case_conversion
-import inflect
+import inflection
 from cookiecutter.main import cookiecutter as run_cookiecutter
 
 COOKIECUTTER_TEMPLATE = resource_filename('ekklesia_common', 'cookiecutter/concept')
@@ -29,8 +29,7 @@ def main():
     concepts_package = app_package / 'concepts'
     concept_name = sys.argv[1]
 
-    p = inflect.engine()
-    concept_name_plural = p.plural(concept_name)
+    concept_name_plural = inflection.pluralize(concept_name)
     concept_name_camelcase_upper = case_conversion.pascalcase(concept_name)
     concept_name_camelcase_upper_plural = case_conversion.pascalcase(concept_name_plural)
 
