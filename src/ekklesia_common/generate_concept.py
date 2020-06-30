@@ -7,12 +7,13 @@ The script must be run from the project's root dir, for example:
 """
 import os
 from pathlib import Path
+from pkg_resources import resource_filename
 import sys
 import case_conversion
 import inflect
 from cookiecutter.main import cookiecutter as run_cookiecutter
 
-COOKIECUTTER_TEMPLATE = str(Path(__file__).parent)
+COOKIECUTTER_TEMPLATE = resource_filename('ekklesia_common', 'cookiecutter/concept')
 
 def main():
     if len(sys.argv) == 1:

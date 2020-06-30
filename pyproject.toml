@@ -39,6 +39,10 @@ pytest-instafail = "^0.4.1"
 responses = "^0.10.15"
 webtest = "^2.0.35"
 
+[tool.poetry.scripts]
+ekklesia-generate-concept = 'ekklesia_common.generate_concept:main'
+
+
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
