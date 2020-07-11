@@ -5,9 +5,6 @@ let
   sources_ = if (sources == null) then import ./sources.nix else sources;
   pkgs = import sources_.nixpkgs { };
   niv = (import sources_.niv { }).niv;
-  cookiecutter = (import ./cookiecutter.nix { inherit pkgs; }).packages.cookiecutter;
-  eliotPkgs = (import ./eliot.nix { inherit pkgs; }).packages;
-  pdbpp = (import ./pdbpp.nix { inherit pkgs; }).packages.pdbpp;
   inherit ((import "${sources_.poetry2nix}/overlay.nix") pkgs pkgs) poetry2nix poetry;
   python = pkgs.python38;
 
@@ -41,21 +38,21 @@ in rec {
     inherit overrides;
   }) poetryPackages pyProject;
 
+  poetryPackagesByName =
+    lib.listToAttrs
+      (map
+        (p: { name = p.pname; value = p; })
+        poetryPackages);
+
   # Can be imported in Python code or run directly as debug tools
   debugLibsAndTools = [
     python.pkgs.ipython
-    pdbpp
-  ];
-
-  devLibs = [
-    cookiecutter
   ];
 
   pythonEnv = python.buildEnv.override {
     extraLibs =
       poetryPackages ++
-      debugLibsAndTools ++
-      devLibs;
+      debugLibsAndTools;
     ignoreCollisions = true;
   };
 
