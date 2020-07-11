@@ -10,6 +10,13 @@ let
   pdbpp = (import ./pdbpp.nix { inherit pkgs; }).packages.pdbpp;
   inherit ((import "${sources_.poetry2nix}/overlay.nix") pkgs pkgs) poetry2nix poetry;
   python = pkgs.python38;
+
+  poetryWrapper = with python.pkgs; pkgs.writeScriptBin "poetry" ''
+    export PYTHONPATH=
+    unset SOURCE_DATE_EPOCH
+    ${poetry}/bin/poetry "$@"
+  '';
+
   overrides = poetry2nix.overrides.withDefaults (
     self: super: {
       munch = super.munch.overridePythonAttrs (
@@ -63,12 +70,12 @@ in rec {
 
   # Various tools for log files, deps management, running scripts and so on
   shellTools = [
-    eliotPkgs.eliot-tree
+    poetryPackagesByName.eliot-tree
     niv
     pkgs.entr
     pkgs.jq
     pkgs.zsh
-    poetry
+    poetryWrapper
   ];
 
   # Needed for a development nix shell
