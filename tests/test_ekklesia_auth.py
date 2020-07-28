@@ -221,7 +221,7 @@ def test_oauth_dance(app, client, browser_session, token):
     with responses.RequestsMock() as rsps:
         userinfo = {
             'preferred_username': 'egon',
-            'auid': 'auid_egon',
+            'sub': 'sub_egon',
             'roles': ['LV Bayern', 'BV'],
             'eligible': True,
             'verified': True

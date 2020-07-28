@@ -24,9 +24,6 @@ class EkklesiaNotAuthorized(Exception):
     pass
 
 
-AUID = NewType('AUID', str)
-
-
 class OAuthToken(Base):
     __tablename__ = 'oauth_token'
     id = C(Integer, FK('users.id'), primary_key=True)
@@ -38,7 +35,7 @@ class OAuthToken(Base):
 
 @dataclass
 class EkklesiaAuthData:
-    auid: AUID
+    sub: str
     preferred_username: str
     roles: List[str]
     eligible: bool
@@ -163,8 +160,8 @@ class EkklesiaAuthApp(App):
 def ekklesia_auth_setting_section():
     return {
         'enabled': False,
-        'client_id': 'ekklesia_portal',
-        'client_secret': "ekklesia_portal_secret",
+        'client_id': "",
+        'client_secret': "",
         'authorization_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/auth",
         'token_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/token",
         'userinfo_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/userinfo",
