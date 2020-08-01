@@ -1,6 +1,7 @@
 from functools import wraps
 import inspect
 import sys
+from typing import get_type_hints
 import dectate
 from dectate import directive
 from dectate.config import create_code_info
@@ -27,20 +28,27 @@ class ConceptApp(morepath.App):
 
     concept = directive(ConceptAction)
 
+
     @classmethod
-    def html(cls, model, render=None, template=None, load=None,
+    def html(cls, model=None, render=None, template=None, load=None,
                  permission=None, internal=False, **predicates):
 
-        sup = super().html(model, render, template, load, permission, internal, **predicates)
+        sup_html = super().html
+        model_outer = model
 
-        frame = sys._getframe(1)
-        code_info = create_code_info(frame)
-        sup.code_info = code_info
+        def decorator(fn):
 
-        def add_log_wrapper(fn):
-            argspec = inspect.getargspec(fn)
-            num_args = len(argspec.args)
-            arg_names = argspec.args
+            if model_outer:
+                model = model_outer
+            else:
+                model = get_type_hints(fn)['self']
+
+            sup_decorator = sup_html(model, render, template, load, permission, internal, **predicates)
+
+            frame = sys._getframe(1)
+            code_info = create_code_info(frame)
+            sup_decorator.code_info = code_info
+
             fn_path = fn.__module__.split('.')
 
             if fn_path[1] == 'concepts':
@@ -66,6 +74,6 @@ class ConceptApp(morepath.App):
                 with start_action(action_type='html_view', **ctx):
                     return fn(*args, **kwargs)
 
-            return sup(log_wrapper)
+            return sup_decorator(log_wrapper)
 
-        return add_log_wrapper
+        return decorator

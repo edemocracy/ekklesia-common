@@ -1,3 +1,4 @@
+from typing import get_type_hints
 import dectate
 import morepath
 from morepath.directive import SettingAction, PredicateAction, isbaseclass, issubclass_or_none
@@ -21,7 +22,7 @@ class CellAction(dectate.Action):
 
     app_class_arg = True
 
-    def __init__(self, model, name='', permission=None, **predicates):
+    def __init__(self, model=None, name='', permission=None, **predicates):
         self.model = model
         self.name = name
         self.permission = permission
@@ -45,6 +46,9 @@ class CellAction(dectate.Action):
         def cell_view(self, request):
             cell = obj(self, request)
             return cell.show()
+
+        if self.model is None:
+            self.model = get_type_hints(obj)['_model']
 
         obj.model = self.model
         app_class.get_cell_class.register(get_cell_class, **self.key_dict())
