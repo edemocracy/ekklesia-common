@@ -18,6 +18,8 @@ from ekklesia_common.cell_app import CellApp
 from ekklesia_common.concept import ConceptApp
 from ekklesia_common.contract import FormApp
 from ekklesia_common.ekklesia_auth import EkklesiaAuthApp
+from ekklesia_common.identity_policy import NoIdentity
+from ekklesia_common.permission import WritePermission
 from ekklesia_common.templating import make_jinja_env, make_template_loader
 from ekklesia_common.request import EkklesiaRequest
 
@@ -39,6 +41,12 @@ class EkklesiaBrowserApp(BabelApp, BrowserSessionApp, CellApp, ConceptApp, Ekkle
         self.jinja_env = make_jinja_env(jinja_environment_class=JinjaCellEnvironment,
                                         jinja_options=dict(loader=template_loader),
                                         app=self)
+
+
+@EkklesiaBrowserApp.permission_rule(model=object, permission=WritePermission, identity=NoIdentity)
+def has_write_permission_not_logged_in(identity, model, permission):
+    """Protects all views with write actions from users that aren't logged in."""
+    return False
 
 
 @EkklesiaBrowserApp.setting_section(section="browser_session")
