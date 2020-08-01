@@ -1,3 +1,3 @@
-import morepath
+import functools
 
-cached_property = morepath.reify
+cached_property = functools.cached_property

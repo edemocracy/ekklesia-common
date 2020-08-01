@@ -1,5 +1,5 @@
+from functools import cached_property
 import morepath
-from ekklesia_common.utils import cached_property
 from ekklesia_common import database
 
 

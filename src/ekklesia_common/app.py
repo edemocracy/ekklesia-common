@@ -1,7 +1,8 @@
 import logging
 import os
-from pkg_resources import resource_filename
 import secrets
+from functools import cached_property
+from pkg_resources import resource_filename
 
 from eliot import start_task
 import morepath
@@ -19,7 +20,6 @@ from ekklesia_common.contract import FormApp
 from ekklesia_common.ekklesia_auth import EkklesiaAuthApp
 from ekklesia_common.templating import make_jinja_env, make_template_loader
 from ekklesia_common.request import EkklesiaRequest
-from ekklesia_common.utils import cached_property
 
 logg = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import dataclasses
 import logging
 import dataclasses
 from dataclasses import dataclass
-from functools import partial
+from functools import cached_property, partial
 from typing import List, NewType
 from urllib.parse import urljoin
 
@@ -15,7 +15,6 @@ from webob.exc import HTTPForbidden
 
 from ekklesia_common.database import Base, C, rel, bref, FK
 from ekklesia_common.enums import EkklesiaUserType
-from ekklesia_common.utils import cached_property
 
 logg = logging.getLogger(__name__)
 
