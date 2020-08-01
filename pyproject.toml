@@ -37,11 +37,13 @@ cookiecutter = "^1.7.2"
 pdbpp = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.4.2"
+pytest = "^6.0.1"
 pytest-cov = "^2.8.1"
 pytest-instafail = "^0.4.1"
 responses = "^0.10.15"
 webtest = "^2.0.35"
+pytest-pspec = "^0.0.4"
+coverage = {extras = ["toml"], version = "^5.2.1"}
 
 [tool.poetry.scripts]
 ekklesia-generate-concept = 'ekklesia_common.generate_concept:main'
