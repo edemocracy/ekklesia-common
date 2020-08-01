@@ -13,6 +13,6 @@ in pkgs.buildEnv {
   name = "ekklesia-common-dev-env";
   ignoreCollisions = true;
   paths = with deps;
-    [ pythonDev ] ++
+    [ pythonEnv ] ++
     linters;
 }
