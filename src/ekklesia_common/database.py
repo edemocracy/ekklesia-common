@@ -2,7 +2,7 @@ import json
 import logging
 import time
 from eliot import start_action
-from sqlalchemy import Column, ForeignKey, Table, event, Integer, DateTime, func as sqlfunc, create_engine
+from sqlalchemy import Column, ForeignKey, Table, event, Integer, MetaData, DateTime, func as sqlfunc, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import relationship, backref, sessionmaker, scoped_session
 from sqlalchemy.ext.compiler import compiles
@@ -15,10 +15,8 @@ import zope.sqlalchemy
 rel = relationship
 FK = ForeignKey
 C = Column
-Base = declarative_base()
 Table = Table
 bref = backref
-db_metadata = Base.metadata
 
 SLOW_QUERY_SECONDS = 0.3
 
@@ -27,6 +25,21 @@ sqllog = logging.getLogger("sqllog")
 Session = scoped_session(sessionmaker())
 
 sqlalchemy_utils.force_auto_coercion()
+
+# Taken from https://alembic.sqlalchemy.org/en/latest/naming.html
+
+meta = MetaData(
+    naming_convention={
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s"
+    }
+)
+
+Base = declarative_base(metadata=meta)
+db_metadata = Base.metadata
 
 
 def dynamic_rel(*args, **kwargs):
