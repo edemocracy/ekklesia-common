@@ -63,11 +63,11 @@ class JSONObject(colander.SchemaType):
         try:
             result = json.loads(cstruct)
         except json.JSONDecodeError as e:
-            raise Invalid(
+            raise colander.Invalid(
                 node,
                 colander._(
                     '${val} is not a JSON object: ${err}',
-                    mapping={'val': cstruct}
+                    mapping={'val': cstruct, 'err': e}
                 )
             )
 
