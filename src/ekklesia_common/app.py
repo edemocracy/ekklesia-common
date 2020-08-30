@@ -19,6 +19,7 @@ from ekklesia_common.concept import ConceptApp
 from ekklesia_common.contract import FormApp
 from ekklesia_common.ekklesia_auth import EkklesiaAuthApp
 from ekklesia_common.identity_policy import NoIdentity
+from ekklesia_common.lid import LID
 from ekklesia_common.permission import WritePermission
 from ekklesia_common.templating import make_jinja_env, make_template_loader
 from ekklesia_common.request import EkklesiaRequest
@@ -102,6 +103,11 @@ def make_ekklesia_customizations_tween(app, handler):
         return handler(request)
 
     return ekklesia_customizations_tween
+
+
+@EkklesiaBrowserApp.converter(type=LID)
+def convert_lid():
+    return morepath.Converter(lambda s: LID.from_str(s), lambda l: str(l))
 
 
 def get_locale(request):

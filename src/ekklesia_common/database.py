@@ -2,7 +2,7 @@ import json
 import logging
 import time
 from eliot import start_action
-from sqlalchemy import Column, ForeignKey, Table, event, Integer, MetaData, DateTime, func as sqlfunc, create_engine
+from sqlalchemy import Column, ForeignKey, Table, event, Integer, MetaData, DateTime, func as sqlfunc, create_engine, types
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import relationship, backref, sessionmaker, scoped_session
 from sqlalchemy.ext.compiler import compiles
@@ -11,6 +11,8 @@ from sqlalchemy.schema import CreateColumn
 import sqlalchemy_utils
 import yaml
 import zope.sqlalchemy
+
+from ekklesia_common.lid import LID
 
 rel = relationship
 FK = ForeignKey
@@ -44,6 +46,33 @@ db_metadata = Base.metadata
 
 def dynamic_rel(*args, **kwargs):
     return rel(*args, lazy="dynamic", **kwargs)
+
+
+class LIDType(types.TypeDecorator, sqlalchemy_utils.types.scalar_coercible.ScalarCoercible):
+
+    impl = types.BigInteger
+    python_type = LID
+
+    @staticmethod
+    def _coerce(value):
+        if value and not isinstance(value, LID):
+            value = LID(value)
+
+        return value
+
+    def process_bind_param(self, value, dialect):
+        if isinstance(value, LID):
+            return value.lid
+        elif isinstance(value, str):
+            return LID.from_str(value).lid
+        else:
+            return value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+
+        return LID(value)
 
 
 class TimeStamp(object):
