@@ -164,6 +164,7 @@ def ekklesia_auth_setting_section():
         'authorization_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/auth",
         'token_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/token",
         'userinfo_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/userinfo",
+        'display_name': 'Ekklesia Login',
     }
 
 
