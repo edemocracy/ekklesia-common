@@ -34,3 +34,7 @@ class EkklesiaRequest(morepath.Request):
     def render_template(self, template: str, **context) -> str:
         jinja_template: Template = self.app.jinja_env.get_template(template)
         return jinja_template.render(**context)
+
+    def flash(self, message, category="primary"):
+        flashed_messages = self.browser_session.setdefault("flashed_messages", [])
+        flashed_messages.append((category, message))
