@@ -4,7 +4,7 @@ import dataclasses
 from dataclasses import dataclass
 from functools import cached_property, partial
 from typing import List, NewType, Optional
-from urllib.parse import urljoin
+from urllib.parse import quote, unquote, urljoin
 
 import dectate
 from eliot import start_task
@@ -92,6 +92,9 @@ class EkklesiaAuth:
     def data(self) -> EkklesiaAuthData:
         return EkklesiaAuthData.from_dict(self.userinfo)
 
+    def logout_url(self, redirect_url) -> None:
+        return self.settings.logout_url + "?redirect_uri=" + quote(redirect_url)
+
 
 class GetOAuthTokenAction(dectate.Action):
     app_class_arg = True
@@ -164,6 +167,7 @@ def ekklesia_auth_setting_section():
         'authorization_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/auth",
         'token_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/token",
         'userinfo_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/userinfo",
+        'logout_url': "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/logout",
         'display_name': 'Ekklesia Login',
         'required_role_for_login': None
     }
@@ -194,14 +198,15 @@ def dump_ekklesia_auth_data_json(self, _request):
 
 class EkklesiaLogin:
 
-    def __init__(self, redirect_uri=None, settings=None, session=None):
-        self.redirect_uri = redirect_uri
+    def __init__(self, redirect_url=None, back_url=None, settings=None, session=None):
+        self.back_url = back_url
+        self.redirect_url = redirect_url
         self.settings = settings
         self.session = session
 
     @cached_property
     def oauth(self):
-        return OAuth2Session(client_id=self.settings.client_id, redirect_uri=self.redirect_uri)
+        return OAuth2Session(client_id=self.settings.client_id, redirect_uri=self.redirect_url)
 
     def get_authorization_url(self):
         authorization_url, state = self.oauth.authorization_url(self.settings.authorization_url)
@@ -210,9 +215,9 @@ class EkklesiaLogin:
 
 
 @EkklesiaAuthPathApp.path(model=EkklesiaLogin, path="/login")
-def oauth_login(request):
-    redirect_uri = request.class_link(OAuthCallback)
-    return EkklesiaLogin(redirect_uri, request.app.root.settings.ekklesia_auth, request.browser_session)
+def oauth_login(request, back_url=None):
+    redirect_url = request.class_link(OAuthCallback, variables={"back_url": back_url})
+    return EkklesiaLogin(redirect_url, back_url, request.app.root.settings.ekklesia_auth, request.browser_session)
 
 
 @EkklesiaAuthPathApp.view(model=EkklesiaLogin)
@@ -222,17 +227,18 @@ def get_oauth_login(self, _):
 
 
 class OAuthCallback:
-    def __init__(self, request):
+    def __init__(self, request, back_url):
         self.request = request
         self.settings = request.app.root.settings.ekklesia_auth
         self.session = request.browser_session
+        self.back_url = back_url
         self.called_url = request.url
-        self.oauth = OAuth2Session(client_id=self.settings.client_id, redirect_uri=request.link(self),
-                                   state=self.session.get('oauth_state'))
+        self.oauth_state = self.session.pop('oauth_state')
 
-    @property
-    def redirect_after_success_url(self):
-        return "/"
+    @cached_property
+    def oauth(self):
+        return OAuth2Session(client_id=self.settings.client_id, redirect_uri=self.request.link(self),
+                             state=self.oauth_state)
 
     def fetch_token(self):
         self.token = self.oauth.fetch_token(token_url=self.settings.token_url,
@@ -248,15 +254,15 @@ class OAuthCallback:
 
 
 @EkklesiaAuthPathApp.path(model=OAuthCallback, path="/callback")
-def oauth_callback(request):
-    return OAuthCallback(request)
+def oauth_callback(request, back_url=None):
+    return OAuthCallback(request, back_url)
 
 
 @EkklesiaAuthPathApp.view(model=OAuthCallback)
 def get_oauth_callback(self, _request):
     self.fetch_token()
     self.after_auth()
-    return redirect(self.redirect_after_success_url)
+    return redirect(self.back_url or "/")
 
 
 @EkklesiaAuthPathApp.path(model=EkklesiaAuthData, path="/info")
