@@ -3,7 +3,7 @@ import logging
 import dataclasses
 from dataclasses import dataclass
 from functools import cached_property, partial
-from typing import List, NewType
+from typing import List, NewType, Optional
 from urllib.parse import urljoin
 
 import dectate
@@ -35,10 +35,10 @@ class OAuthToken(Base):
 @dataclass
 class EkklesiaAuthData:
     sub: str
-    preferred_username: str
     roles: List[str]
-    eligible: bool
-    verified: bool
+    preferred_username: Optional[str] = None
+    eligible: Optional[bool] = None
+    verified: Optional[bool] = None
 
     @classmethod
     def from_dict(cls, dict_) -> 'EkklesiaAuthData':
