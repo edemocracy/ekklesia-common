@@ -55,8 +55,11 @@ class LIDType(types.TypeDecorator, sqlalchemy_utils.types.scalar_coercible.Scala
 
     @staticmethod
     def _coerce(value):
-        if value and not isinstance(value, LID):
-            value = LID(value)
+        if value:
+            if isinstance(value, int):
+                return LID(value)
+            elif isinstance(value, str):
+                return LID.from_str(value)
 
         return value
 
