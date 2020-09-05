@@ -4,7 +4,7 @@ import dataclasses
 from dataclasses import dataclass
 from functools import cached_property, partial
 from typing import List, NewType, Optional
-from urllib.parse import quote, unquote, urljoin
+from urllib.parse import quote, unquote
 
 import dectate
 from eliot import start_task
@@ -255,7 +255,7 @@ class OAuthCallback:
 
 @EkklesiaAuthPathApp.path(model=OAuthCallback, path="/callback")
 def oauth_callback(request, back_url=None):
-    return OAuthCallback(request, back_url)
+    return OAuthCallback(request, unquote(back_url))
 
 
 @EkklesiaAuthPathApp.view(model=OAuthCallback)
