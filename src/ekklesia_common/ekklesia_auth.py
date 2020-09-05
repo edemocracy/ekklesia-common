@@ -255,7 +255,9 @@ class OAuthCallback:
 
 @EkklesiaAuthPathApp.path(model=OAuthCallback, path="/callback")
 def oauth_callback(request, back_url=None):
-    return OAuthCallback(request, unquote(back_url))
+    if back_url:
+        back_url = unquote(back_url)
+    return OAuthCallback(request, back_url)
 
 
 @EkklesiaAuthPathApp.view(model=OAuthCallback)
