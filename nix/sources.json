@@ -5,10 +5,10 @@
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "e82eb322ea32a747a51c431d7787221bcc6d9038",
-        "sha256": "1fy4dcr05d80diwlxmh42xnjm5ki1pkbky38smvlqjaky2y2f71f",
+        "rev": "29ddaaf4e099c3ac0647f5b652469dfc79cd3b53",
+        "sha256": "1va6myp07gkspgxfch8z3rs9nyvys6jmgzkys6a2c4j09qxp1bs0",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/e82eb322ea32a747a51c431d7787221bcc6d9038.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/29ddaaf4e099c3ac0647f5b652469dfc79cd3b53.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
@@ -17,10 +17,10 @@
         "homepage": "https://github.com/NixOS/nixpkgs",
         "owner": "NixOS",
         "repo": "nixpkgs-channels",
-        "rev": "32b46dd897ab2143a609988a04d87452f0bbef59",
-        "sha256": "1gzfrpjnr1bz9zljsyg3a4zrhk8r927sz761mrgcg56dwinkhpjk",
+        "rev": "5aba0fe9766a7201a336249fd6cb76e0d7ba2faf",
+        "sha256": "05gawlhizp85agdpw3kpjn41vggdiywbabsbmk76r2dr513188jz",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs-channels/archive/32b46dd897ab2143a609988a04d87452f0bbef59.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/5aba0fe9766a7201a336249fd6cb76e0d7ba2faf.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "poetry2nix": {
@@ -29,10 +29,10 @@
         "homepage": "",
         "owner": "dpausp",
         "repo": "poetry2nix",
-        "rev": "2d6a4cf18aa709c017a46f945c03a170fccda1f5",
-        "sha256": "1jzwyriwsi8h2d85lw4zljzj7192i8nqd9f8ww35vnara6fhl2ig",
+        "rev": "af7827be1a61a2191a3a913b88e6f423a04a0596",
+        "sha256": "0yv9wlmdjl1ik9hy5cgarq3v96cxbch36smwy2r0brqwlg7zq990",
         "type": "tarball",
-        "url": "https://github.com/dpausp/poetry2nix/archive/2d6a4cf18aa709c017a46f945c03a170fccda1f5.tar.gz",
+        "url": "https://github.com/dpausp/poetry2nix/archive/af7827be1a61a2191a3a913b88e6f423a04a0596.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
