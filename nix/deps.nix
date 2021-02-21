@@ -5,7 +5,7 @@ let
   sources_ = if (sources == null) then import ./sources.nix else sources;
   pkgs = import sources_.nixpkgs { };
   niv = (import sources_.niv { }).niv;
-  inherit ((import "${sources_.poetry2nix}/overlay.nix") pkgs pkgs) poetry2nix poetry;
+  poetry2nix = pkgs.callPackage sources_.poetry2nix {};
   python = pkgs.python38;
 
   poetryWrapper = with python.pkgs; pkgs.writeScriptBin "poetry" ''
@@ -18,7 +18,7 @@ let
     self: super: {
       munch = super.munch.overridePythonAttrs (
         old: {
-          propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.pbr self.setuptools ];
+          propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.pbr ];
         }
       );
     });
@@ -41,7 +41,7 @@ in rec {
   poetryPackagesByName =
     lib.listToAttrs
       (map
-        (p: { name = p.pname; value = p; })
+        (p: { name = p.pname or "none"; value = p; })
         poetryPackages);
 
   # Can be imported in Python code or run directly as debug tools
