@@ -4,7 +4,6 @@ with builtins;
 let
   sources_ = if (sources == null) then import ./sources.nix else sources;
   pkgs = import sources_.nixpkgs { };
-  niv = (import sources_.niv { }).niv;
   poetry2nix = pkgs.callPackage sources_.poetry2nix {};
   python = pkgs.python38;
 
@@ -68,7 +67,7 @@ in rec {
   # Various tools for log files, deps management, running scripts and so on
   shellTools = [
     poetryPackagesByName.eliot-tree
-    niv
+    pkgs.niv
     pkgs.entr
     pkgs.jq
     pkgs.zsh
