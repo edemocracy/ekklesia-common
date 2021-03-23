@@ -2,10 +2,11 @@
   - extends "{{ cookiecutter.app_package }}/layout.j2.jade"
 
 - block title
-  title
-    = brand_title
-    |&nbsp;-&nbsp;
-    = _('{{cookiecutter.concept_name}}')
+  if layout
+    title
+      = brand_title
+      |&nbsp;-&nbsp;
+      = _('{{cookiecutter.concept_name}}')
 
 
 - block content
