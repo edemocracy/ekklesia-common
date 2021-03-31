@@ -110,10 +110,6 @@ def enum_property(enum_cls, **kwargs):
     return colander.SchemaNode(colander.Enum(enum_cls), **kwargs)
 
 
-def datetime_property(**kwargs):
-    return colander.SchemaNode(colander.DateTime(), **kwargs)
-
-
 def json_property(**kwargs):
     return colander.SchemaNode(JSONObject(), **kwargs)
 
