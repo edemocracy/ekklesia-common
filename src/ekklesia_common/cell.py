@@ -248,8 +248,8 @@ class JinjaCellContext(jinja2.runtime.Context):
     Custom jinja context with the ability to look up template variables in a cell (view model)
     """
 
-    def __init__(self, environment, parent, name, blocks):
-        super().__init__(environment, parent, name, blocks)
+    def __init__(self, environment, parent, name, blocks, globals):
+        super().__init__(environment, parent, name, blocks, globals)
         self._cell = parent.get('_cell')
 
     def resolve_or_missing(self, key):

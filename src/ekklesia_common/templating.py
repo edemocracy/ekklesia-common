@@ -96,7 +96,7 @@ def markdown(text):
 
 def make_template_loader(app_config, package_name):
     loader_mapping = {p: PackageLoader(f"{package_name}.concepts.{p}") for p in app_config.concepts}
-    template_loader = ChoiceLoader([PrefixLoader(loader_mapping), PackageLoader(package_name)])
+    template_loader = PrefixLoader(loader_mapping)
     return template_loader
 
 

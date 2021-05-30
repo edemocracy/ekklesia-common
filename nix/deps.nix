@@ -5,7 +5,7 @@ let
   sources_ = if (sources == null) then import ./sources.nix else sources;
   pkgs = import sources_.nixpkgs { };
   poetry2nix = pkgs.callPackage sources_.poetry2nix {};
-  python = pkgs.python38;
+  python = pkgs.python39;
 
   poetryWrapper = with python.pkgs; pkgs.writeScriptBin "poetry" ''
     export PYTHONPATH=
