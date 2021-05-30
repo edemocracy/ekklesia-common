@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ekklesia-common"
-version = "21.05.0"
+version = "21.05.1"
 description = "Common code for the Ekklesia e-democracy platform"
 readme = "README.md"
 keywords = ["ekklesia", "edemocracy", "evoting", "participation"]
