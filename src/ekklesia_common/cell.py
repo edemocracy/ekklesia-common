@@ -202,6 +202,26 @@ class Cell(metaclass=CellMeta):
             fragment_method.__name__ = name
             return fragment_method
 
+    @classmethod
+    def template_fragment(cls, template_name: str):
+        """This can be used for template fragmentation or alternative presentation
+        of the same concept.
+        Can be called with a string argument as a shortcut for creating a
+        fragment method based on conventions:
+
+        `fragment = Cell.template_fragment('name')`
+        creates a method that renders the template `{template_prefix}/name.j2.jade`
+        """
+        def fragment_method(self) -> str:
+            if self.template_prefix is not None:
+                template = f'{self.template_prefix}/{template_name}.j2.jade'
+            else:
+                template = f'{name}.j2.jade'
+            return self.render_template(template)
+
+        fragment_method._fragment = True
+        fragment_method.__name__ = template_name
+        return fragment_method
 
     @cached_property
     def self_link(self) -> str:
