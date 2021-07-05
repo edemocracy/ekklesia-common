@@ -51,6 +51,8 @@ def cell_class(model):
         def fragment_without_params(self):
             pass
 
+        cannot_call_this = None
+
         fragment_from_name = Cell.fragment('name')
 
     return TestCell
@@ -161,6 +163,14 @@ def test_cell_render_cell(cell, model):
     assert cell.render_template.call_args[0][0] == cell.template_path
 
 
+def test_cell_render_cell_shows_error_if_view_method_not_callable(cell, model):
+    with raises(ValueError) as e:
+        cell.render_cell(model, 'cannot_call_this')
+
+    assert "cannot_call_this" in str(e)
+    assert "TestModel" in str(e)
+
+
 def test_cell_render_cell_fragment(cell, model):
     cell.render_cell(model, 'alternate_fragment', some_option=42)
     cell.render_template.assert_called
@@ -177,6 +187,17 @@ def test_cell_render_cell_collection(cell, model):
     assert result == 'test&test'
     cell.cell.assert_any_call(model, layout=None, some_option=42)
     cell.cell.assert_any_call(model2, layout=None, some_option=42)
+
+
+def test_cell_render_cell_collection_view_method_not_callable(cell, model):
+    model2 = model.copy()
+    model2.title = "test2"
+    models = [model, model2]
+    with raises(ValueError) as e:
+        cell.render_cell(collection=models, view_name='cannot_call_this')
+
+    assert "cannot_call_this" in str(e)
+    assert "TestModel" in str(e)
 
 
 def test_cell_render_cell_model_and_collection_not_allowed(cell, model):

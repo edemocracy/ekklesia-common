@@ -148,12 +148,20 @@ class Cell(metaclass=CellMeta):
         """Look up a cell by model and render it to HTML.
         The parent cell is set to self which also means that it will be rendered without layout by default.
         """
-        view_method = view_name if view_name is not None else 'show'
+        view_method_name = view_name if view_name is not None else 'show'
         if collection is not None:
             if model is not None:
                 raise ValueError("model and collection arguments cannot be used together!")
 
-            parts = [getattr(self.cell(item, layout=layout, **options), view_method)() for item in collection]
+            parts = []
+
+            for item in collection:
+                view_method = getattr(self.cell(item, layout=layout, **options), view_method_name)
+
+                if not callable(view_method):
+                    raise ValueError(f"view method '{view_method_name}' of {item} is not callable, it is: {view_method}")
+
+                parts.append(view_method())
 
             if separator is None:
                 separator = "\n"
@@ -161,7 +169,10 @@ class Cell(metaclass=CellMeta):
             return self.markup_class(separator.join(parts))
 
         else:
-            return getattr(self.cell(model, layout=layout, **options), view_method)()
+            view_method = getattr(self.cell(model, layout=layout, **options), view_method_name)
+            if not callable(view_method):
+                raise ValueError(f"view method '{view_method_name}' of {model} is not callable, it is: {view_method}")
+            return view_method()
 
     @classmethod
     def fragment(cls, func_or_name):
