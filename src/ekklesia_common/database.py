@@ -50,6 +50,7 @@ def dynamic_rel(*args, **kwargs):
 
 class LIDType(types.TypeDecorator, sqlalchemy_utils.types.scalar_coercible.ScalarCoercible):
 
+    cache_ok = True
     impl = types.BigInteger
     python_type = LID
 
