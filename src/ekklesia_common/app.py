@@ -1,5 +1,5 @@
+from collections import namedtuple
 import logging
-import os
 import secrets
 from functools import cached_property
 from pkg_resources import resource_filename
@@ -10,9 +10,7 @@ from more.babel_i18n import BabelApp
 from more.browser_session import BrowserSessionApp
 from more.forwarded import ForwardedApp
 from more.transaction import TransactionApp
-import yaml
 
-from ekklesia_common import database
 from ekklesia_common.cell import JinjaCellEnvironment
 from ekklesia_common.cell_app import CellApp
 from ekklesia_common.concept import ConceptApp
@@ -27,7 +25,8 @@ from ekklesia_common.request import EkklesiaRequest
 logg = logging.getLogger(__name__)
 
 
-class EkklesiaBrowserApp(BabelApp, BrowserSessionApp, CellApp, ConceptApp, EkklesiaAuthApp, FormApp, ForwardedApp, TransactionApp):
+class EkklesiaBrowserApp(BabelApp, BrowserSessionApp, CellApp, ConceptApp, EkklesiaAuthApp, FormApp, ForwardedApp,
+                         TransactionApp):
 
     request_class = EkklesiaRequest
     package_name = 'ekklesia_common'
@@ -39,9 +38,8 @@ class EkklesiaBrowserApp(BabelApp, BrowserSessionApp, CellApp, ConceptApp, Ekkle
     def __init__(self):
         super().__init__()
         template_loader = make_template_loader(self.__class__.config, self.__class__.package_name)
-        self.jinja_env = make_jinja_env(jinja_environment_class=JinjaCellEnvironment,
-                                        jinja_options=dict(loader=template_loader),
-                                        app=self)
+        self.jinja_env = make_jinja_env(
+            jinja_environment_class=JinjaCellEnvironment, jinja_options=dict(loader=template_loader), app=self)
 
 
 @EkklesiaBrowserApp.permission_rule(model=object, permission=WritePermission, identity=NoIdentity)
@@ -54,7 +52,7 @@ def has_write_permission_not_logged_in(identity, model, permission):
 def browser_session_setting_section():
     return {
         "secret_key": secrets.token_urlsafe(64),
-        "cookie_secure": True
+        "cookie_secure": True,
     }
 
 
@@ -68,11 +66,17 @@ def common_setting_section():
     }
 
 
+@EkklesiaBrowserApp.setting_section(section='database')
+def database_setting_section():
+    """Database config for SQLAlchemy/psycopg2"""
+    return {
+        "enable_statement_history": False,
+    }
+
+
 @EkklesiaBrowserApp.setting_section(section="static_files")
 def static_files_setting_section():
-    return {
-        "base_url": "/static"
-    }
+    return {"base_url": "/static"}
 
 
 @EkklesiaBrowserApp.tween_factory()

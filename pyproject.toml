@@ -45,6 +45,7 @@ sqlalchemy_utils = "^0.37"
 webtest = "^2.0.35"
 pytest-instafail = "^0.4.2"
 pytest-pspec = "^0.0.4"
+psycopg2 = "^2.9.1"
 
 [tool.poetry.scripts]
 ekklesia-generate-concept = 'ekklesia_common.generate_concept:main'

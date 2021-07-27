@@ -13,6 +13,7 @@ import yaml
 import zope.sqlalchemy
 
 from ekklesia_common.lid import LID
+from ekklesia_common.psycopg2_debug import make_debug_connection_factory
 
 rel = relationship
 FK = ForeignKey
@@ -37,8 +38,7 @@ meta = MetaData(
         "ck": "ck_%(table_name)s_%(constraint_name)s",
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s"
-    }
-)
+    })
 
 Base = declarative_base(metadata=meta)
 db_metadata = Base.metadata
@@ -89,9 +89,7 @@ class LowerCaseText(types.TypeDecorator):
 
 
 class TimeStamp(object):
-
     """a simple timestamp mixin"""
-
     @declared_attr
     def created_at(cls):
         return C(DateTime, default=sqlfunc.now())
@@ -121,8 +119,7 @@ Base.update = update_model
 
 
 def to_dict(self):
-    return dict((str(col.name), getattr(self, col.name))
-                for col in self.__table__.columns)
+    return dict((str(col.name), getattr(self, col.name)) for col in self.__table__.columns)
 
 
 def to_yaml(self):
@@ -139,15 +136,13 @@ Base.to_json = to_json
 
 
 @event.listens_for(Engine, "before_cursor_execute")
-def before_cursor_execute(conn, cursor, statement,
-                          parameters, context, executemany):
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     conn.info.setdefault('query_start_time', []).append(time.time())
     conn.info.setdefault('current_query', []).append(statement)
 
 
 @event.listens_for(Engine, "after_cursor_execute")
-def after_cursor_execute(conn, cursor, statement,
-                         parameters, context, executemany):
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     total = time.time() - conn.info['query_start_time'].pop(-1)
     # total in seconds
     if total > SLOW_QUERY_SECONDS:
@@ -159,9 +154,14 @@ def after_cursor_execute(conn, cursor, statement,
 
 
 def configure_sqlalchemy(db_settings, testing=False):
-    with start_action(action_type="configure_sqlalchemy",
-                      sqlalchemy_url=db_settings.uri) as ctx:
-        engine = create_engine(db_settings.uri)
+    with start_action(action_type="configure_sqlalchemy", sqlalchemy_url=db_settings.uri) as ctx:
+
+        if db_settings.enable_statement_history:
+            connect_args = {"connection_factory": make_debug_connection_factory()}
+        else:
+            connect_args = {}
+
+        engine = create_engine(db_settings.uri, connect_args=connect_args)
         Session.configure(bind=engine)
         zope.sqlalchemy.register(Session, keep_session=True if testing else False)
         db_metadata.bind = engine
