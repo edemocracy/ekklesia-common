@@ -1,16 +1,17 @@
-from collections import namedtuple
-import logging
+from datetime import datetime
 import secrets
 from functools import cached_property
 from pkg_resources import resource_filename
 
-from eliot import start_task
+from eliot import start_task, log_message
 import morepath
+from webob.exc import HTTPError
 from more.babel_i18n import BabelApp
 from more.browser_session import BrowserSessionApp
 from more.forwarded import ForwardedApp
 from more.transaction import TransactionApp
 
+from ekklesia_common.errors import exception_uid
 from ekklesia_common.cell import JinjaCellEnvironment
 from ekklesia_common.cell_app import CellApp
 from ekklesia_common.concept import ConceptApp
@@ -21,8 +22,6 @@ from ekklesia_common.lid import LID
 from ekklesia_common.permission import WritePermission
 from ekklesia_common.templating import make_jinja_env, make_template_loader
 from ekklesia_common.request import EkklesiaRequest
-
-logg = logging.getLogger(__name__)
 
 
 class EkklesiaBrowserApp(BabelApp, BrowserSessionApp, CellApp, ConceptApp, EkklesiaAuthApp, FormApp, ForwardedApp,
@@ -62,7 +61,7 @@ def common_setting_section():
     return {
         "fail_on_form_validation_error": False,
         "force_ssl": False,
-        "instance_name": "ekklesia_app"
+        "instance_name": "ekklesia_app",
     }
 
 
@@ -71,6 +70,7 @@ def database_setting_section():
     """Database config for SQLAlchemy/psycopg2"""
     return {
         "enable_statement_history": False,
+        "print_sql_statements": False,
     }
 
 
@@ -78,22 +78,54 @@ def database_setting_section():
 def static_files_setting_section():
     return {"base_url": "/static"}
 
+class UnhandledRequestException(RuntimeError):
+
+    def __init__(self, task_uuid, xid):
+        self.task_uuid = task_uuid
+        self.xid = xid
+        super().__init__(f"XID {xid}")
+
+
 
 @EkklesiaBrowserApp.tween_factory()
-def make_ekklesia_log_tween(app, handler):
+def make_ekklesia_log_tween(app: EkklesiaBrowserApp, handler):
+    db_settings = app.settings.database
+
+    print_sql_statements = db_settings.enable_statement_history and db_settings.print_sql_statements
+
     def ekklesia_log_tween(request):
-        request_data = {
-            'url': request.url,
-            'headers': dict(request.headers)
-        }
+        request_data = {'url': request.url, 'headers': dict(request.headers)}
 
         user = request.current_user
 
         if user is not None:
             request_data['user'] = user.id
 
-        with start_task(action_type='request', request=request_data):
-            return handler(request)
+        with start_task(action_type='request', request=request_data) as task:
+            try:
+                if print_sql_statements:
+                    history = request.db_session.connection().connection.connection.history
+                    history.clear()
+                response = handler(request)
+
+                if print_sql_statements:
+                    print()
+                    print(f"{SQL_PRINT_PREFIX}SQL statements for this request")
+                    history.print_statements(prefix=SQL_PRINT_PREFIX)
+                    print(
+                        f"{SQL_PRINT_PREFIX}{len(history)} SQL statements, duration {history.overall_duration_ms():.2f}ms"
+                    )
+                    print()
+                return response
+            except HTTPError:
+                # Let Morepath handle this (exception views).
+                raise
+            except Exception as e:
+                # Something else failed, wrap the exception and add metadata for better error reporting.
+                datetime_now = datetime.now()
+                suffix = task.task_uuid[:7]
+                xid = exception_uid(e, datetime_now, suffix)
+                raise UnhandledRequestException(task.task_uuid, xid) from e
 
     return ekklesia_log_tween
 
