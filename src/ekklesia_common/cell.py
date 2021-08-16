@@ -231,6 +231,9 @@ class Cell(metaclass=CellMeta):
     def self_url(self) -> str:
         return self.link(self._model)
 
+    def self_view_url(self, view_name):
+        return self.link(self._model, view_name)
+
     @cached_property
     def edit_url(self) -> str:
         return self.link(self._model, '+edit')
