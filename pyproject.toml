@@ -46,6 +46,7 @@ webtest = "^2.0.35"
 pytest-instafail = "^0.4.2"
 pytest-pspec = "^0.0.4"
 psycopg2 = "^2.9.1"
+better-exceptions = "^0.3.3"
 
 [tool.poetry.scripts]
 ekklesia-generate-concept = 'ekklesia_common.generate_concept:main'
