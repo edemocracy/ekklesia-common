@@ -47,15 +47,15 @@ else:
 
 
 # Idea taken from: https://github.com/itamarst/eliot/issues/394
+EXCLUDED_EXCEPTION_MEMBERS = set(dir(Exception())) | {"__weakref__", "__module__"}
 
-def _exception_data(exc: BaseException):
+def _get_exception_data(exc: BaseException):
     # Exclude the attributes that appear on a regular exception,
     # aside from a few interesting ones.
     if hasattr(exc, "__structlog__"):
         return exc.__structlog__()
     else:
-        exclude = (set(dir(Exception())) | {"__weakref__", "__module__"}) - {"args"}
-        return {k: v for k, v in inspect.getmembers(exc) if k not in exclude}
+        return {k: v for k, v in inspect.getmembers(exc) if k not in EXCLUDED_EXCEPTION_MEMBERS}
 
 
 def _exception_data_and_traceback(exc: Exception) -> dict[str, str]:
@@ -68,7 +68,10 @@ def _exception_data_and_traceback(exc: Exception) -> dict[str, str]:
         data["xid"] = exc.xid
     else:
         data["traceback"] = 'Traceback (most recent call last):\n' + _format_traceback(exc.__traceback__)
-        data["data"] = _exception_data(exc)
+        exception_data = _get_exception_data(exc)
+        if exception_data:
+            data["data"] = exception_data
+        data["reason"] = str(exc)
 
     return data
 
