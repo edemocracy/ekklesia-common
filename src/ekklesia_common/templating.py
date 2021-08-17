@@ -10,7 +10,7 @@ from pyjade.ext.jinja import PyJadeExtension as JinjaJadeExtension
 from pyjade.utils import process
 from werkzeug.datastructures import ImmutableDict
 from jinja2.filters import contextfilter
-from jinja2 import Undefined, PackageLoader, ChoiceLoader, PrefixLoader
+from jinja2 import Undefined, PackageLoader, PrefixLoader
 from ekklesia_common import md
 
 
@@ -46,7 +46,8 @@ class PyJadeExtension(JinjaJadeExtension):
         if (not name or
                 (name and not os.path.splitext(name)[1] in self.file_extensions)):
             return source
-        return process(source, filename=name, compiler=JinjaAutoescapeCompiler, **self.options)
+        jinja_code = process(source, filename=name, compiler=JinjaAutoescapeCompiler, **self.options)
+        return jinja_code
 
 
 def select_jinja_autoescape(filename):
@@ -126,16 +127,12 @@ def make_jinja_env(jinja_environment_class, jinja_options, app):
     )
     babel_filters = {name: make_babel_filter(func_name) for name, func_name in babel_filter_names}
 
-    jinja_globals = dict(url_for=lambda *a, **k: "#",
-                         get_flashed_messages=lambda *a, **k: [])
-
     default_jinja_options = ImmutableDict(
         extensions=[PyJadeExtension, "jinja2.ext.autoescape", "jinja2.ext.i18n"],
         autoescape=select_jinja_autoescape
     )
 
     jinja_env = jinja_environment_class(**default_jinja_options, **jinja_options)
-    jinja_env.globals.update(jinja_globals)
     jinja_env.filters.update(babel_filters)
     jinja_env.filters['markdown'] = markdown
     jinja_env.filters['yesno'] = yesno
