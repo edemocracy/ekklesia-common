@@ -7,6 +7,7 @@ from typing import Any, Iterable, Dict, Type, ClassVar
 import case_conversion
 import inspect
 import jinja2
+import jinja2.utils
 from markupsafe import Markup
 
 
@@ -55,6 +56,15 @@ class CellAttributeAccessError(Exception):
         self.cell_type = cell_type
         self.attribute_name = attribute_name
         msg = f"{cell_type}.{attribute_name} raised {type(exception).__name__}: {exception}"
+        super().__init__(msg)
+
+class CellAttributeNotFound(Exception):
+    def __init__(self, cell, attribute_name) -> None:
+        cell_type = type(cell).__name__
+        self.cell_type = cell_type
+        self.attribute_name = attribute_name
+        msg = (f"{cell_type} has no attribute '{attribute_name}'. " +
+            "Is it from the model? Did you forget to add it to 'model_properties'?")
         super().__init__(msg)
 
 class Cell(metaclass=CellMeta):
@@ -274,15 +284,14 @@ class Cell(metaclass=CellMeta):
         if name in self.model_properties:
             return getattr(self._model, name)
 
-        raise AttributeError(f"{self.__class__.__name__} has no attribute '{name}'."
-                             " Is it from the model? Did you forget to add it to 'model_properties'?")
+        raise AttributeError()
 
     def __getitem__(self, name):
         try:
             return getattr(self, name)
         except AttributeError as e:
             # standard __getitem__ raises an KeyError, let's do the same
-            raise KeyError(e.args[0])
+            raise KeyError(str(e))
 
     def __contains__(self, name):
         return name in self.model_properties or hasattr(self, name)
@@ -298,14 +307,21 @@ class JinjaCellContext(jinja2.runtime.Context):
         self._cell = parent.get('_cell')
 
     def resolve_or_missing(self, key):
+        resolved = super().resolve_or_missing(key)
+
         if self._cell is not None:
+            cell = self._cell
             if key == "_request":
-                return self._cell._request
+                return cell._request
 
-            if key in self._cell:
-                return self._cell[key]
+            if key in cell:
+                return cell[key]
 
-        return super().resolve_or_missing(key)
+            if resolved == jinja2.utils.missing:
+                raise CellAttributeNotFound(cell, key)
+
+        return resolved
+
 
     def __contains__(self, name):
         if self._cell and name in self._cell:
