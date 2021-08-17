@@ -48,6 +48,14 @@ class CellMeta(type):
 
         return super().__new__(meta, name, bases, dct)
 
+class CellAttributeAccessError(Exception):
+
+    def __init__(self, cell, attribute_name, exception) -> None:
+        cell_type = type(cell).__name__
+        self.cell_type = cell_type
+        self.attribute_name = attribute_name
+        msg = f"{cell_type}.{attribute_name} raised {type(exception).__name__}: {exception}"
+        super().__init__(msg)
 
 class Cell(metaclass=CellMeta):
     """
@@ -246,16 +254,19 @@ class Cell(metaclass=CellMeta):
 
     def __getattribute__(self, name):
         """
-        Fixes the problem that AttributeErrors thrown by properties are invisible.
-        AttributeError in this method causes __getattr__ to be called which
-        produces a misleading error. We have to convert the exception to pass it on.
         """
         try:
             ret = object.__getattribute__(self, name)
-        except AttributeError as e:
-            if hasattr(self.__class__, name):
-                raise RuntimeError(e)
-            raise
+        except Exception as e:
+            if isinstance(e, AttributeError) and not hasattr(self.__class__, name):
+                # We got a AttributeError here that tells us that the class doesn't
+                # have a member called `name`. raising it now causes __getattr__
+                # to be called next.
+                raise
+
+            # AttributeErrors from the called attribute are converted so they don't
+            # trigger __getattr__ and produce a misleading error.
+            raise CellAttributeAccessError(self, name, e) from e
 
         return ret
 
