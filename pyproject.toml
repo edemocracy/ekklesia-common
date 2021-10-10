@@ -32,7 +32,6 @@ jinja2 = "^3.0"
 morepath = "^0.19"
 munch = "^2.5.0"
 pdbpp = "^0.10.2"
-py-gfm = "^0.1.4"
 pyjade = "^4.0.0"
 pytest = "^6.0.1"
 pytest-cov = "^2.10.1"
@@ -47,6 +46,7 @@ pytest-instafail = "^0.4.2"
 pytest-pspec = "^0.0.4"
 psycopg2 = "^2.9.1"
 better-exceptions = "^0.3.3"
+py-gfm = "^1.0.2"
 
 [tool.poetry.scripts]
 ekklesia-generate-concept = 'ekklesia_common.generate_concept:main'
