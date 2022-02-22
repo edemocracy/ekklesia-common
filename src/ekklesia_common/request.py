@@ -50,3 +50,7 @@ class EkklesiaRequest(morepath.Request):
     def flash(self, message, category="primary"):
         flashed_messages = self.browser_session.setdefault("flashed_messages", [])
         flashed_messages.append((category, message))
+
+    @property
+    def htmx(self):
+        return self.headers.get("HX-Request")
