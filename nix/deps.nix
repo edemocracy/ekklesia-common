@@ -20,6 +20,11 @@ let
           propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.pbr ];
         }
       );
+      iso8601 = super.iso8601.overridePythonAttrs (
+        old: {
+          propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.poetry ];
+        }
+      );
     });
 
 in rec {
