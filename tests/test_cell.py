@@ -3,7 +3,10 @@ from unittest.mock import Mock
 from munch import Munch
 from pytest import fixture, raises
 import ekklesia_common.cell
-from ekklesia_common.cell import Cell, JinjaCellEnvironment
+from ekklesia_common.cell import (
+    Cell, JinjaCellEnvironment,
+    CellAttributeNotFound, JinjaCellContext
+)
 from ekklesia_common.app import make_jinja_env
 from ekklesia_common.request import EkklesiaRequest
 from webob.request import BaseRequest
@@ -62,6 +65,12 @@ def cell_class(model):
 def cell(cell_class, model, request_for_cell):
     cell_class.render_template = Mock()
     return cell_class(model, request_for_cell)
+
+
+@fixture
+def context(cell, jinja_env):
+    parent = {"_cell": cell}
+    return JinjaCellContext(jinja_env, parent, None, {}, {})
 
 
 def test_root_cell_uses_layout(cell):
@@ -129,25 +138,6 @@ def test_cell_attrs_override_model_attrs(cell, model):
     assert cell["id"] == 42
 
 
-def test_cannot_access_private_attr_from_cell(cell, model):
-    with raises(AttributeError):
-        cell.private
-
-
-def test_missing_cell_attribute_raises_exception(cell, model):
-    with raises(AttributeError) as excinfo:
-        cell.does_not_exist
-
-    assert 'does_not_exist' in str(excinfo.value)
-
-
-def test_missing_cell_item_raises_exception(cell, model):
-    with raises(KeyError) as excinfo:
-        cell['does_not_exist']
-
-    assert 'does_not_exist' in str(excinfo.value)
-
-
 def test_cell_template_path(cell, model):
     assert cell.template_path == "test.j2.jade"
 
@@ -211,3 +201,22 @@ def test_cell_jinja_integration(cell_class, model, render_template, request_for_
     res = cell.show()
     assert str(model.id) in res.content
     assert model.title in res.content
+
+
+def test_context_resolve_or_missing(context):
+    result = context.resolve_or_missing("title")
+    assert result == "test"
+
+
+def test_context_resolve_or_missing_raises_exception_for_inexistent(context):
+    with raises(CellAttributeNotFound) as excinfo:
+        context.resolve_or_missing('does_not_exist')
+
+    assert 'does_not_exist' in str(excinfo.value)
+
+
+def test_context_resolve_or_missing_raises_exception_for_private(context):
+    with raises(CellAttributeNotFound) as excinfo:
+        context.resolve_or_missing("private")
+
+    assert 'private' in str(excinfo.value)
