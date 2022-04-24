@@ -61,12 +61,17 @@ in rec {
   };
 
   # Code style and security tools
-  linters = with python.pkgs; [
+  linters = with python.pkgs; let
+    isortWrapper = with python.pkgs; pkgs.writeScriptBin "isort" ''
+      ${isort}/bin/isort --virtual-env=${pythonEnv} --profile=black "$@"
+    '';
+  in [
     bandit
+    black
+    isortWrapper
     mypy
     pylama
     pylint
-    yapf
   ];
 
   # Various tools for log files, deps management, running scripts and so on
