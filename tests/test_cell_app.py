@@ -10,7 +10,7 @@ class ATestApp(CellApp):
     pass
 
 
-@ATestApp.cell(ATestModel, 'name')
+@ATestApp.cell(ATestModel, "name")
 class ATestCell(Cell):
     pass
 
@@ -19,4 +19,4 @@ def test_get_cell(request_for_cell):
     model = ATestModel()
     ATestApp.commit()
     app = ATestApp()
-    assert app.get_cell(model, request_for_cell, 'name')
+    assert app.get_cell(model, request_for_cell, "name")

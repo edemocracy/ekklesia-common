@@ -1,9 +1,9 @@
-from io import StringIO
+import inspect
 import logging
 import os
 import sys
-import inspect
 import traceback
+from io import StringIO
 
 import eliot
 from eliot.json import EliotJSONEncoder
@@ -11,8 +11,8 @@ from eliot.stdlib import EliotHandler
 
 from ekklesia_common.app import UnhandledRequestException
 
-class EkklesiaLogEncoder(EliotJSONEncoder):
 
+class EkklesiaLogEncoder(EliotJSONEncoder):
     def default(self, obj):
 
         try:
@@ -20,18 +20,22 @@ class EkklesiaLogEncoder(EliotJSONEncoder):
         except TypeError:
             return repr(obj)
 
+
 if os.environ.get("BETTER_EXCEPTIONS"):
-    import better_exceptions.formatter
     import better_exceptions.color
+    import better_exceptions.formatter
+
     formatter = better_exceptions.formatter.ExceptionFormatter(
         colored=better_exceptions.color.SUPPORTS_COLOR,
         theme=better_exceptions.formatter.THEME,
         max_length=better_exceptions.formatter.MAX_LENGTH,
         pipe_char=better_exceptions.formatter.PIPE_CHAR,
-        cap_char=better_exceptions.formatter.CAP_CHAR)
+        cap_char=better_exceptions.formatter.CAP_CHAR,
+    )
 
     def _format_traceback(tb) -> str:
         return "".join(formatter.format_traceback(tb))
+
 else:
 
     def _format_traceback(tb) -> str:
@@ -49,31 +53,37 @@ else:
 # Idea taken from: https://github.com/itamarst/eliot/issues/394
 EXCLUDED_EXCEPTION_MEMBERS = set(dir(Exception())) | {"__weakref__", "__module__"}
 
+
 def _get_exception_data(exc: BaseException):
     # Exclude the attributes that appear on a regular exception,
     # aside from a few interesting ones.
     if hasattr(exc, "__structlog__"):
         return exc.__structlog__()
     else:
-        return {k: v for k, v in inspect.getmembers(exc) if k not in EXCLUDED_EXCEPTION_MEMBERS}
+        return {
+            k: v
+            for k, v in inspect.getmembers(exc)
+            if k not in EXCLUDED_EXCEPTION_MEMBERS
+        }
 
 
 def _exception_data_and_traceback(exc: Exception) -> dict[str, str]:
     exception_class = type(exc)
-    data = {
-        "exception": exception_class.__module__ + "." + exception_class.__name__
-    }
+    data = {"exception": exception_class.__module__ + "." + exception_class.__name__}
 
     if isinstance(exc, UnhandledRequestException):
         data["xid"] = exc.xid
     else:
-        data["traceback"] = 'Traceback (most recent call last):\n' + _format_traceback(exc.__traceback__)
+        data["traceback"] = "Traceback (most recent call last):\n" + _format_traceback(
+            exc.__traceback__
+        )
         exception_data = _get_exception_data(exc)
         if exception_data:
             data["data"] = exception_data
         data["reason"] = str(exc)
 
     return data
+
 
 def _add_exception_data_and_traceback(exc: Exception):
     try:
@@ -90,8 +100,9 @@ def _add_exception_data_and_traceback(exc: Exception):
         return {
             "log_error": "While trying to extract and format exception metadata, another exception occurred",
             "log_error_msg": f"{type(e).__name__}: {e}",
-            "log_error_traceback": _format_traceback(e.__traceback__)
+            "log_error_traceback": _format_traceback(e.__traceback__),
         }
+
 
 def init_logging():
     eliot.register_exception_extractor(Exception, _add_exception_data_and_traceback)
@@ -107,4 +118,3 @@ def init_logging():
     eliot.to_file(sys.stderr, encoder=EkklesiaLogEncoder)
 
     logging.captureWarnings(True)
-

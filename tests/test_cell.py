@@ -1,22 +1,31 @@
 import inspect
 from unittest.mock import Mock
+
 from munch import Munch
 from pytest import fixture, raises
-import ekklesia_common.cell
-from ekklesia_common.cell import (
-    Cell, JinjaCellEnvironment,
-    CellAttributeNotFound, JinjaCellContext
-)
-from ekklesia_common.app import make_jinja_env
-from ekklesia_common.request import EkklesiaRequest
 from webob.request import BaseRequest
+
+import ekklesia_common.cell
+from ekklesia_common.app import make_jinja_env
+from ekklesia_common.cell import (
+    Cell,
+    CellAttributeNotFound,
+    JinjaCellContext,
+    JinjaCellEnvironment,
+)
+from ekklesia_common.request import EkklesiaRequest
 
 
 @fixture
 def jinja_env(app):
     import jinja2
+
     template_loader = jinja2.loaders.PackageLoader("tests")
-    return make_jinja_env(jinja_environment_class=JinjaCellEnvironment, jinja_options=dict(loader=template_loader), app=app)
+    return make_jinja_env(
+        jinja_environment_class=JinjaCellEnvironment,
+        jinja_options=dict(loader=template_loader),
+        app=app,
+    )
 
 
 @fixture
@@ -37,7 +46,7 @@ def cell_class(model):
     _model = model
 
     class TestCell(Cell):
-        model_properties = ['id', 'title']
+        model_properties = ["id", "title"]
         markup_class = DummyMarkup
 
         def _get_cell_class(self, model, view):
@@ -48,7 +57,7 @@ def cell_class(model):
 
         @Cell.fragment
         def alternate_fragment(self, **k):
-            return self.render_template('alternate_template', **k)
+            return self.render_template("alternate_template", **k)
 
         @Cell.fragment
         def fragment_without_params(self):
@@ -56,7 +65,7 @@ def cell_class(model):
 
         cannot_call_this = None
 
-        fragment_from_name = Cell.fragment('name')
+        fragment_from_name = Cell.fragment("name")
 
     return TestCell
 
@@ -95,7 +104,7 @@ def test_cell_getattr(cell, model):
 
 
 def test_cell_automatic_property_from_no_arg_method(cell):
-    assert cell.test_url == 'https://example.com/test'
+    assert cell.test_url == "https://example.com/test"
 
 
 def test_cell_fragment_methods_are_not_properties(cell):
@@ -109,16 +118,16 @@ def test_cell_fragment_method_has_marker(cell):
 
 
 def test_fragment_from_name_with_prefix(cell):
-    cell.template_prefix = 'templates'
+    cell.template_prefix = "templates"
     cell.render_template = Mock()
     cell.fragment_from_name()
-    cell.render_template.assert_called_with('templates/name.j2.jade')
+    cell.render_template.assert_called_with("templates/name.j2.jade")
 
 
 def test_fragment_from_name_without_prefix(cell):
     cell.render_template = Mock()
     cell.fragment_from_name()
-    cell.render_template.assert_called_with('name.j2.jade')
+    cell.render_template.assert_called_with("name.j2.jade")
 
 
 def test_cell_getitem(cell, model):
@@ -155,16 +164,16 @@ def test_cell_render_cell(cell, model):
 
 def test_cell_render_cell_shows_error_if_view_method_not_callable(cell, model):
     with raises(ValueError) as e:
-        cell.render_cell(model, 'cannot_call_this')
+        cell.render_cell(model, "cannot_call_this")
 
     assert "cannot_call_this" in str(e)
     assert "TestModel" in str(e)
 
 
 def test_cell_render_cell_fragment(cell, model):
-    cell.render_cell(model, 'alternate_fragment', some_option=42)
+    cell.render_cell(model, "alternate_fragment", some_option=42)
     cell.render_template.assert_called
-    assert cell.render_template.call_args[0][0] == 'alternate_template'
+    assert cell.render_template.call_args[0][0] == "alternate_template"
 
 
 def test_cell_render_cell_collection(cell, model):
@@ -172,9 +181,9 @@ def test_cell_render_cell_collection(cell, model):
     model2.title = "test2"
     models = [model, model2]
     cell.cell = Mock()
-    cell.cell.return_value.show = Mock(return_value='test')
-    result = cell.render_cell(collection=models, separator='&', some_option=42)
-    assert result == 'test&test'
+    cell.cell.return_value.show = Mock(return_value="test")
+    result = cell.render_cell(collection=models, separator="&", some_option=42)
+    assert result == "test&test"
     cell.cell.assert_any_call(model, layout=None, some_option=42)
     cell.cell.assert_any_call(model2, layout=None, some_option=42)
 
@@ -184,7 +193,7 @@ def test_cell_render_cell_collection_view_method_not_callable(cell, model):
     model2.title = "test2"
     models = [model, model2]
     with raises(ValueError) as e:
-        cell.render_cell(collection=models, view_name='cannot_call_this')
+        cell.render_cell(collection=models, view_name="cannot_call_this")
 
     assert "cannot_call_this" in str(e)
     assert "TestModel" in str(e)
@@ -210,13 +219,13 @@ def test_context_resolve_or_missing(context):
 
 def test_context_resolve_or_missing_raises_exception_for_inexistent(context):
     with raises(CellAttributeNotFound) as excinfo:
-        context.resolve_or_missing('does_not_exist')
+        context.resolve_or_missing("does_not_exist")
 
-    assert 'does_not_exist' in str(excinfo.value)
+    assert "does_not_exist" in str(excinfo.value)
 
 
 def test_context_resolve_or_missing_raises_exception_for_private(context):
     with raises(CellAttributeNotFound) as excinfo:
         context.resolve_or_missing("private")
 
-    assert 'private' in str(excinfo.value)
+    assert "private" in str(excinfo.value)

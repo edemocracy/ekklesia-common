@@ -1,18 +1,17 @@
-from functools import wraps
 import inspect
 import sys
+from functools import wraps
 from typing import get_type_hints
+
 import dectate
+import morepath
 from dectate import directive
 from dectate.config import create_code_info
 from eliot import start_action
-import morepath
 
 
 class ConceptAction(dectate.Action):
-    config = {
-        'concepts': dict
-    }
+    config = {"concepts": dict}
 
     def __init__(self, name):
         self.name = name
@@ -28,10 +27,17 @@ class ConceptApp(morepath.App):
 
     concept = directive(ConceptAction)
 
-
     @classmethod
-    def html(cls, model=None, render=None, template=None, load=None,
-                 permission=None, internal=False, **predicates):
+    def html(
+        cls,
+        model=None,
+        render=None,
+        template=None,
+        load=None,
+        permission=None,
+        internal=False,
+        **predicates
+    ):
 
         sup_html = super().html
         model_outer = model
@@ -41,37 +47,36 @@ class ConceptApp(morepath.App):
             if model_outer:
                 model = model_outer
             else:
-                model = get_type_hints(fn)['self']
+                model = get_type_hints(fn)["self"]
 
-            sup_decorator = sup_html(model, render, template, load, permission, internal, **predicates)
+            sup_decorator = sup_html(
+                model, render, template, load, permission, internal, **predicates
+            )
 
             frame = sys._getframe(1)
             code_info = create_code_info(frame)
             sup_decorator.code_info = code_info
 
-            fn_path = fn.__module__.split('.')
+            fn_path = fn.__module__.split(".")
 
-            if fn_path[1] == 'concepts':
+            if fn_path[1] == "concepts":
                 ctx = {
-                    'app': fn_path[0],
-                    'concept': fn_path[2].capitalize(),
-                    'view': fn.__qualname__
+                    "app": fn_path[0],
+                    "concept": fn_path[2].capitalize(),
+                    "view": fn.__qualname__,
                 }
             else:
-                ctx = {
-                    'module': fn.__module__,
-                    'view': fn.__qualname__
-                }
+                ctx = {"module": fn.__module__, "view": fn.__qualname__}
 
             @wraps(fn)
             def log_wrapper(*args, **kwargs):
 
                 model = args[0]
-                model_data = model.to_dict() if hasattr(model, 'to_dict') else model
+                model_data = model.to_dict() if hasattr(model, "to_dict") else model
 
-                ctx['model'] = model_data
+                ctx["model"] = model_data
 
-                with start_action(action_type='html_view', **ctx):
+                with start_action(action_type="html_view", **ctx):
                     return fn(*args, **kwargs)
 
             return sup_decorator(log_wrapper)

@@ -1,8 +1,10 @@
-from datetime import datetime
 import os.path
+from datetime import datetime
+
 import jinja2.runtime
 from more.babel_i18n.request_utils import BabelRequestUtils
 from pytest import fixture
+
 from ekklesia_common.templating import make_jinja_env
 
 TEST_DATETIME = datetime(2017, 1, 1, 11, 23, 42)
@@ -20,7 +22,11 @@ class JinjaTestEnvironment(jinja2.Environment):
 @fixture
 def jinja_env(app):
     template_loader = jinja2.FileSystemLoader(os.path.dirname(__file__))
-    jinja_env = make_jinja_env(jinja_environment_class=JinjaTestEnvironment, jinja_options=dict(loader=template_loader), app=app)
+    jinja_env = make_jinja_env(
+        jinja_environment_class=JinjaTestEnvironment,
+        jinja_options=dict(loader=template_loader),
+        app=app,
+    )
     return jinja_env
 
 
@@ -73,4 +79,3 @@ def test_translation_with_args(app, render_string):
     app.settings.babel_i18n.default_locale = "en_US"
     res = render_string("{{ _('hello_date', date='2019-01-01', time='11:11') }}")
     assert res == "hello, today is 2019-01-01 and the time is 11:11."
-

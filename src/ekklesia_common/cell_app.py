@@ -1,8 +1,14 @@
 from typing import get_type_hints
+
 import dectate
 import morepath
-from morepath.directive import SettingAction, PredicateAction, isbaseclass, issubclass_or_none
 import reg
+from morepath.directive import (
+    PredicateAction,
+    SettingAction,
+    isbaseclass,
+    issubclass_or_none,
+)
 
 
 class CellAction(dectate.Action):
@@ -10,19 +16,16 @@ class CellAction(dectate.Action):
     depends = [SettingAction, PredicateAction]
 
     filter_convert = {
-        'model': dectate.convert_dotted_name,
-        'render': dectate.convert_dotted_name,
-        'permission': dectate.convert_dotted_name
+        "model": dectate.convert_dotted_name,
+        "render": dectate.convert_dotted_name,
+        "permission": dectate.convert_dotted_name,
     }
 
-    filter_compare = {
-        'model': isbaseclass,
-        'permission': issubclass_or_none
-    }
+    filter_compare = {"model": isbaseclass, "permission": issubclass_or_none}
 
     app_class_arg = True
 
-    def __init__(self, model=None, name='', permission=None, **predicates):
+    def __init__(self, model=None, name="", permission=None, **predicates):
         self.model = model
         self.name = name
         self.permission = permission
@@ -32,8 +35,8 @@ class CellAction(dectate.Action):
         """Return a dict containing cell registration info,
         for instance model, etc."""
         result = self.predicates.copy()
-        result['model'] = self.model
-        result['name'] = self.name
+        result["model"] = self.model
+        result["name"] = self.name
         return result
 
     def identifier(self, app_class):
@@ -48,7 +51,7 @@ class CellAction(dectate.Action):
             return cell.show()
 
         if self.model is None:
-            self.model = get_type_hints(obj)['_model']
+            self.model = get_type_hints(obj)["_model"]
 
         obj.model = self.model
         app_class.get_cell_class.register(get_cell_class, **self.key_dict())
@@ -59,7 +62,7 @@ class CellApp(morepath.App):
 
     cell = dectate.directive(CellAction)
 
-    @morepath.dispatch_method(reg.match_instance('model'), reg.match_key('name'))
+    @morepath.dispatch_method(reg.match_instance("model"), reg.match_key("name"))
     def get_cell_class(self, model, name):
         return None
 

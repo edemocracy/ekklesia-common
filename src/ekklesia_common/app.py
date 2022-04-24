@@ -1,47 +1,62 @@
-from datetime import datetime
 import secrets
+from datetime import datetime
 from functools import cached_property
-from pkg_resources import resource_filename
 
-from eliot import start_task, log_message
 import morepath
-from webob.exc import HTTPError
+from eliot import log_message, start_task
 from more.babel_i18n import BabelApp
 from more.browser_session import BrowserSessionApp
 from more.forwarded import ForwardedApp
 from more.transaction import TransactionApp
+from pkg_resources import resource_filename
+from webob.exc import HTTPError
 
-from ekklesia_common.errors import exception_uid
 from ekklesia_common.cell import JinjaCellEnvironment
 from ekklesia_common.cell_app import CellApp
 from ekklesia_common.concept import ConceptApp
 from ekklesia_common.contract import FormApp
 from ekklesia_common.ekklesia_auth import EkklesiaAuthApp
+from ekklesia_common.errors import exception_uid
 from ekklesia_common.identity_policy import NoIdentity
 from ekklesia_common.lid import LID
 from ekklesia_common.permission import WritePermission
-from ekklesia_common.templating import make_jinja_env, make_template_loader
 from ekklesia_common.request import EkklesiaRequest
+from ekklesia_common.templating import make_jinja_env, make_template_loader
 
 
-class EkklesiaBrowserApp(BabelApp, BrowserSessionApp, CellApp, ConceptApp, EkklesiaAuthApp, FormApp, ForwardedApp,
-                         TransactionApp):
+class EkklesiaBrowserApp(
+    BabelApp,
+    BrowserSessionApp,
+    CellApp,
+    ConceptApp,
+    EkklesiaAuthApp,
+    FormApp,
+    ForwardedApp,
+    TransactionApp,
+):
 
     request_class = EkklesiaRequest
-    package_name = 'ekklesia_common'
+    package_name = "ekklesia_common"
 
     @cached_property
     def translation_dir(self):
-        return resource_filename(self.package_name, 'translations/')
+        return resource_filename(self.package_name, "translations/")
 
     def __init__(self):
         super().__init__()
-        template_loader = make_template_loader(self.__class__.config, self.__class__.package_name)
+        template_loader = make_template_loader(
+            self.__class__.config, self.__class__.package_name
+        )
         self.jinja_env = make_jinja_env(
-            jinja_environment_class=JinjaCellEnvironment, jinja_options=dict(loader=template_loader), app=self)
+            jinja_environment_class=JinjaCellEnvironment,
+            jinja_options=dict(loader=template_loader),
+            app=self,
+        )
 
 
-@EkklesiaBrowserApp.permission_rule(model=object, permission=WritePermission, identity=NoIdentity)
+@EkklesiaBrowserApp.permission_rule(
+    model=object, permission=WritePermission, identity=NoIdentity
+)
 def has_write_permission_not_logged_in(identity, model, permission):
     """Protects all views with write actions from users that aren't logged in."""
     return False
@@ -55,7 +70,7 @@ def browser_session_setting_section():
     }
 
 
-@EkklesiaBrowserApp.setting_section(section='common')
+@EkklesiaBrowserApp.setting_section(section="common")
 def common_setting_section():
     """Various settings that can be used by ekklesia-common code."""
     return {
@@ -65,7 +80,7 @@ def common_setting_section():
     }
 
 
-@EkklesiaBrowserApp.setting_section(section='database')
+@EkklesiaBrowserApp.setting_section(section="database")
 def database_setting_section():
     """Database config for SQLAlchemy/psycopg2"""
     return {
@@ -78,8 +93,8 @@ def database_setting_section():
 def static_files_setting_section():
     return {"base_url": "/static"}
 
-class UnhandledRequestException(RuntimeError):
 
+class UnhandledRequestException(RuntimeError):
     def __init__(self, task_uuid, xid):
         self.task_uuid = task_uuid
         self.xid = xid
@@ -93,20 +108,24 @@ class UnhandledRequestException(RuntimeError):
 def make_ekklesia_log_tween(app: EkklesiaBrowserApp, handler):
     db_settings = app.settings.database
 
-    print_sql_statements = db_settings.enable_statement_history and db_settings.print_sql_statements
+    print_sql_statements = (
+        db_settings.enable_statement_history and db_settings.print_sql_statements
+    )
 
     def ekklesia_log_tween(request):
-        request_data = {'url': request.url, 'headers': dict(request.headers)}
+        request_data = {"url": request.url, "headers": dict(request.headers)}
 
         user = request.current_user
 
         if user is not None:
-            request_data['user'] = user.id
+            request_data["user"] = user.id
 
-        with start_task(action_type='request', request=request_data) as task:
+        with start_task(action_type="request", request=request_data) as task:
             try:
                 if print_sql_statements:
-                    history = request.db_session.connection().connection.connection.history
+                    history = (
+                        request.db_session.connection().connection.connection.history
+                    )
                     history.clear()
                 response = handler(request)
 
@@ -136,7 +155,7 @@ def make_ekklesia_log_tween(app: EkklesiaBrowserApp, handler):
 def make_ekklesia_customizations_tween(app, handler):
     def ekklesia_customizations_tween(request):
         if app.settings.common.force_ssl:
-            request.scheme = 'https'
+            request.scheme = "https"
 
         return handler(request)
 
@@ -149,11 +168,11 @@ def convert_lid():
 
 
 def get_locale(request):
-    locale = request.browser_session.get('lang')
+    locale = request.browser_session.get("lang")
     if locale:
-        logg.debug('locale from session: %s', locale)
+        logg.debug("locale from session: %s", locale)
     else:
-        locale = request.accept_language.best_match(['de', 'en', 'fr'])
-        logg.debug('locale from request: %s', locale)
+        locale = request.accept_language.best_match(["de", "en", "fr"])
+        logg.debug("locale from request: %s", locale)
 
     return locale

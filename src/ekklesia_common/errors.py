@@ -2,8 +2,9 @@ from datetime import datetime
 
 
 def exception_uid(exception: Exception, dt: datetime, suffix: str):
-    import traceback
     import hashlib
+    import traceback
+
     """Builds a unique string (exception UID) that may be exposed to the user without revealing to much.
     """
     dt_str = dt.strftime("%Y_%m_%dT%H_%M_%S")

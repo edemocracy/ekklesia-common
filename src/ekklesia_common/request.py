@@ -1,11 +1,14 @@
 from functools import cached_property
 from typing import Any
+
 import morepath
 from eliot import start_action
+from jinja2 import Template
+from sqlalchemy.orm import Query, Session
+
 from ekklesia_common import database
 from ekklesia_common.permission import Permission
-from jinja2 import Template
-from sqlalchemy.orm import Session, Query
+
 
 class RenderTemplateError(Exception):
     def __init__(self, template_name, cause) -> None:
@@ -14,8 +17,8 @@ class RenderTemplateError(Exception):
         msg = f"Template {template_name} could not be rendered because of an exception: {cause_type}: {cause}"
         super().__init__(msg)
 
-class EkklesiaRequest(morepath.Request):
 
+class EkklesiaRequest(morepath.Request):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -41,7 +44,9 @@ class EkklesiaRequest(morepath.Request):
         with start_action(action_type="template-get", name=name):
             jinja_template: Template = self.app.jinja_env.get_template(name)
         try:
-            with start_action(action_type="template-render", filename=jinja_template.filename):
+            with start_action(
+                action_type="template-render", filename=jinja_template.filename
+            ):
                 return jinja_template.render(**context)
 
         except Exception as e:

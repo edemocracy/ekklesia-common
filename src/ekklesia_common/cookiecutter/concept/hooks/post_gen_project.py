@@ -3,5 +3,5 @@
 import os
 import shutil
 
-shutil.move('tests/{{cookiecutter.concept_name}}', '../../../../tests/concepts/')
-os.rmdir('tests')
+shutil.move("tests/{{cookiecutter.concept_name}}", "../../../../tests/concepts/")
+os.rmdir("tests")

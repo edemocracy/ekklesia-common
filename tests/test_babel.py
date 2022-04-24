@@ -1,7 +1,8 @@
 from io import StringIO
+
 from ekklesia_common.babel import extract_enums
 
-code = '''
+code = """
 # Line 2
 class FirstEnum(Enum):
     A = 'a' # comment
@@ -13,7 +14,7 @@ class SecondEnum(Enum):
 
 class SomethingElse:
     pass
-'''
+"""
 
 
 def test_extract_enums():
@@ -21,9 +22,9 @@ def test_extract_enums():
     translations = extract_enums(StringIO(code), [], [], {})
 
     expected = [
-        (4, 'gettext', 'first_enum_a', ["FirstEnum.A"]),
-        (5, 'gettext', 'first_enum_b_b', ["FirstEnum.B"]),
-        (9, 'gettext', 'second_enum_c_c', ["SecondEnum.C"]),
+        (4, "gettext", "first_enum_a", ["FirstEnum.A"]),
+        (5, "gettext", "first_enum_b_b", ["FirstEnum.B"]),
+        (9, "gettext", "second_enum_c_c", ["SecondEnum.C"]),
     ]
 
     assert translations == expected

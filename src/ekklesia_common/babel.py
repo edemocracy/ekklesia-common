@@ -21,6 +21,7 @@ python_enums = ekklesia_common.babel:extract_enums
 
 
 import ast
+
 from case_conversion import snakecase
 
 
@@ -28,13 +29,13 @@ def is_enum_node(node):
     if not isinstance(node, ast.ClassDef):
         return False
 
-    return any(b.id == 'Enum' for b in node.bases)
+    return any(b.id == "Enum" for b in node.bases)
 
 
 def translation_from_enum_assignment(enum_name, assignment):
     comments = [enum_name + "." + assignment.targets[0].id]
     translation = snakecase(enum_name) + "_" + snakecase(assignment.value.s)
-    return assignment.lineno, 'gettext', translation, comments
+    return assignment.lineno, "gettext", translation, comments
 
 
 def translations_from_enum(enum_node):

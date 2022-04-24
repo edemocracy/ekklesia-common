@@ -5,7 +5,6 @@
 """
 
 import codecs
-from functools import cached_property
 import inspect
 import os
 import re
@@ -13,10 +12,10 @@ import sys
 import sysconfig
 import traceback
 import typing as t
+from functools import cached_property
 from html import escape
 from tokenize import TokenError
-from types import CodeType
-from types import TracebackType
+from types import CodeType, TracebackType
 
 from markupsafe import escape
 from werkzeug.debug.console import Console
@@ -26,6 +25,7 @@ from ekklesia_common.utils import cached_property
 # from werkzeug.internal
 
 _default_encoding = sys.getdefaultencoding()
+
 
 @t.overload
 def _to_str(  # type: ignore
@@ -46,6 +46,7 @@ def _to_str(
 ) -> str:
     ...
 
+
 def _to_str(
     x: t.Optional[t.Any],
     charset: t.Optional[str] = _default_encoding,
@@ -64,10 +65,11 @@ def _to_str(
 
     return x.decode(charset, errors)  # type: ignore
 
+
 ### end werkzeug.internal
 
-_coding_re = re.compile(br"coding[:=]\s*([-\w.]+)")
-_line_re = re.compile(br"^(.*?)$", re.MULTILINE)
+_coding_re = re.compile(rb"coding[:=]\s*([-\w.]+)")
+_line_re = re.compile(rb"^(.*?)$", re.MULTILINE)
 _funcdef_re = re.compile(r"^(\s*def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)")
 
 
@@ -124,7 +126,8 @@ PAGE_HTML = (
 %(plaintext_cs)s
 
 -->
-""")
+"""
+)
 
 SUMMARY_HTML = """\
 <div class="%(classes)s">

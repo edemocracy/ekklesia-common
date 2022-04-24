@@ -1,14 +1,15 @@
 import logging
-from unittest.mock import Mock
 import os.path
+from types import SimpleNamespace as N
+from unittest.mock import Mock
+
+import morepath
+from morepath.request import BaseRequest
 from munch import Munch
 from pytest import fixture
-from morepath.request import BaseRequest
-import morepath
+
 from ekklesia_common.app import EkklesiaBrowserApp
 from ekklesia_common.request import EkklesiaRequest
-from types import SimpleNamespace as N
-
 
 BASEDIR = os.path.dirname(__file__)
 logg = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ def app():
 
 @fixture
 def req(app):
-    environ = BaseRequest.blank('test').environ
+    environ = BaseRequest.blank("test").environ
     return EkklesiaRequest(environ, app)
 
 
@@ -35,7 +36,8 @@ def request_for_cell(app):
         app=N(settings=N(), get_cell_class=None),
         current_user=N(),
         i18n=N(gettext=None),
-        render_template=None)
+        render_template=None,
+    )
 
 
 @fixture
@@ -44,4 +46,3 @@ def model():
         pass
 
     return TestModel(id=5, title="test", private="secret")
-

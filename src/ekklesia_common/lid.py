@@ -6,10 +6,11 @@ The first part is a timestamp in milliseconds since the epoch (42 bits).
 The second part is a random number (22 bits).
 """
 
-from functools import cached_property, total_ordering
 import random
 import time
 from datetime import datetime
+from functools import cached_property, total_ordering
+
 import base32_crockford
 
 
@@ -25,7 +26,6 @@ def encode_timestamp(val):
 
 @total_ordering
 class LID:
-
     def __init__(self, lid: int = None) -> None:
 
         if lid is None:
@@ -84,4 +84,3 @@ class LID:
     @cached_property
     def datetime(self) -> datetime:
         return datetime.fromtimestamp(self.milliseconds / 1000)
-

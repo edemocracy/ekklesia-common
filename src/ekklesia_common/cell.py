@@ -1,20 +1,20 @@
 from __future__ import annotations
+
 import inspect
 import os.path
 from functools import cached_property
-from webob import Request
-from typing import Any, Iterable, Dict, Type, ClassVar
+from typing import Any, ClassVar, Dict, Iterable, Type
+
 import case_conversion
-import inspect
 import jinja2
 import jinja2.utils
 from markupsafe import Markup
+from webob import Request
+
+_cell_registry: Dict[Any, "Cell"] = {}
 
 
-_cell_registry: Dict[Any, 'Cell'] = {}
-
-
-def find_cell_by_model_instance(model) -> 'Cell':
+def find_cell_by_model_instance(model) -> "Cell":
     return _cell_registry[model.__class__]
 
 
@@ -24,12 +24,12 @@ class CellMeta(type):
     """
 
     def __init__(cls, name, bases, attrs, **kwargs):
-        model = getattr(cls, 'model', None)
+        model = getattr(cls, "model", None)
         if model:
             _cell_registry[model] = cls
-        if 'template_prefix' not in cls.__dict__:
-            module_path = cls.__module__.split('.')
-            if module_path[1] == 'concepts':
+        if "template_prefix" not in cls.__dict__:
+            module_path = cls.__module__.split(".")
+            if module_path[1] == "concepts":
                 cls.template_prefix = module_path[2]
             else:
                 cls.template_prefix = None
@@ -40,17 +40,19 @@ class CellMeta(type):
         # only for subclasses, not for Cell class
         if bases:
             for k, v in dct.items():
-                if (not k.startswith('_')
-                        and inspect.isfunction(v)
-                        and not hasattr(v, '_fragment')
-                        and len(inspect.signature(v).parameters) == 1):
+                if (
+                    not k.startswith("_")
+                    and inspect.isfunction(v)
+                    and not hasattr(v, "_fragment")
+                    and len(inspect.signature(v).parameters) == 1
+                ):
                     # turn functions with single argument (self) into cached properties
                     dct[k] = cached_property(v)
 
         return super().__new__(meta, name, bases, dct)
 
-class CellAttributeAccessError(Exception):
 
+class CellAttributeAccessError(Exception):
     def __init__(self, cell, attribute_name, exception) -> None:
         cell_type = type(cell).__name__
         self.cell_type = cell_type
@@ -58,20 +60,25 @@ class CellAttributeAccessError(Exception):
         msg = f"{cell_type}.{attribute_name} raised {type(exception).__name__}: {exception}"
         super().__init__(msg)
 
+
 class CellAttributeNotFound(Exception):
     def __init__(self, cell, attribute_name) -> None:
         cell_type = type(cell).__name__
         self.cell_type = cell_type
         self.attribute_name = attribute_name
-        msg = (f"{cell_type} has no attribute '{attribute_name}'. " +
-            "Is it from the model? Did you forget to add it to 'model_properties'?")
+        msg = (
+            f"{cell_type} has no attribute '{attribute_name}'. "
+            + "Is it from the model? Did you forget to add it to 'model_properties'?"
+        )
         super().__init__(msg)
+
 
 class Cell(metaclass=CellMeta):
     """
     View model base class which is basically a wrapper around a template.
     Templates can access attributes of the cell and some selected model properties directly.
     """
+
     model: ClassVar[Any]
     model_properties: Iterable[str] = []
     layout = True
@@ -79,16 +86,17 @@ class Cell(metaclass=CellMeta):
     #: class that should be used to mark safe HTML output. Must be a subclass of str.
     markup_class: Type[str] = Markup
 
-    def __init__(self,
-                 model,
-                 request: Request,
-                 collection: Iterable = None,
-                 layout: bool = None,
-                 parent: 'Cell' = None,
-                 template_path: str = None,
-                 **options) -> None:
-        """
-        """
+    def __init__(
+        self,
+        model,
+        request: Request,
+        collection: Iterable = None,
+        layout: bool = None,
+        parent: "Cell" = None,
+        template_path: str = None,
+        **options,
+    ) -> None:
+        """ """
         self._model = model
         self._request = request
         self.current_user = request.current_user
@@ -111,10 +119,12 @@ class Cell(metaclass=CellMeta):
     def template_path(self) -> str:
         if self._template_path is None:
             cell_name = self.__class__.__name__
-            if not cell_name.endswith('Cell'):
-                raise Exception('Cell name does not end with Cell, you must override template_path!')
+            if not cell_name.endswith("Cell"):
+                raise Exception(
+                    "Cell name does not end with Cell, you must override template_path!"
+                )
 
-            name = case_conversion.snakecase(cell_name[:-len('Cell')])
+            name = case_conversion.snakecase(cell_name[: -len("Cell")])
 
             if self.template_prefix is not None:
                 self._template_path = f"{self.template_prefix}/{name}.j2.jade"
@@ -124,17 +134,21 @@ class Cell(metaclass=CellMeta):
         return self._template_path
 
     def render_template(self, template_path) -> str:
-        return self.markup_class(self._request.render_template(template_path, _cell=self))
+        return self.markup_class(
+            self._request.render_template(template_path, _cell=self)
+        )
 
     def show(self):
         return self.render_template(self.template_path)
 
     # template helpers
 
-    def link(self, model, name='', *args, **kwargs) -> str:
+    def link(self, model, name="", *args, **kwargs) -> str:
         return self._request.link(model, name, *args, **kwargs)
 
-    def class_link(self, model_class, variables: Dict[str, Any], name='', *args, **kwargs) -> str:
+    def class_link(
+        self, model_class, variables: Dict[str, Any], name="", *args, **kwargs
+    ) -> str:
         return self._request.class_link(model_class, variables, name, *args, **kwargs)
 
     def static_url(self, path):
@@ -149,35 +163,45 @@ class Cell(metaclass=CellMeta):
 
         return cell_class
 
-    def cell(self, model, layout: bool = None, view_name='', **options) -> 'Cell':
+    def cell(self, model, layout: bool = None, view_name="", **options) -> "Cell":
         """Look up a cell by model and create an instance.
         The parent cell is set to self which also means that it will be rendered without layout by default.
         """
         cell_class = self._get_cell_class(model, view_name)
-        return cell_class(model=model, request=self._request, layout=layout, parent=self, **options)
+        return cell_class(
+            model=model, request=self._request, layout=layout, parent=self, **options
+        )
 
-    def render_cell(self,
-                    model=None,
-                    view_name: str = None,
-                    collection: Iterable = None,
-                    separator: str = None,
-                    layout: bool = None,
-                    **options) -> str:
+    def render_cell(
+        self,
+        model=None,
+        view_name: str = None,
+        collection: Iterable = None,
+        separator: str = None,
+        layout: bool = None,
+        **options,
+    ) -> str:
         """Look up a cell by model and render it to HTML.
         The parent cell is set to self which also means that it will be rendered without layout by default.
         """
-        view_method_name = view_name if view_name is not None else 'show'
+        view_method_name = view_name if view_name is not None else "show"
         if collection is not None:
             if model is not None:
-                raise ValueError("model and collection arguments cannot be used together!")
+                raise ValueError(
+                    "model and collection arguments cannot be used together!"
+                )
 
             parts = []
 
             for item in collection:
-                view_method = getattr(self.cell(item, layout=layout, **options), view_method_name)
+                view_method = getattr(
+                    self.cell(item, layout=layout, **options), view_method_name
+                )
 
                 if not callable(view_method):
-                    raise ValueError(f"view method '{view_method_name}' of {item} is not callable, it is: {view_method}")
+                    raise ValueError(
+                        f"view method '{view_method_name}' of {item} is not callable, it is: {view_method}"
+                    )
 
                 parts.append(view_method())
 
@@ -187,9 +211,13 @@ class Cell(metaclass=CellMeta):
             return self.markup_class(separator.join(parts))
 
         else:
-            view_method = getattr(self.cell(model, layout=layout, **options), view_method_name)
+            view_method = getattr(
+                self.cell(model, layout=layout, **options), view_method_name
+            )
             if not callable(view_method):
-                raise ValueError(f"view method '{view_method_name}' of {model} is not callable, it is: {view_method}")
+                raise ValueError(
+                    f"view method '{view_method_name}' of {model} is not callable, it is: {view_method}"
+                )
             return view_method()
 
     @classmethod
@@ -209,11 +237,12 @@ class Cell(metaclass=CellMeta):
             return func
         else:
             name = func_or_name
+
             def fragment_method(self):
                 if self.template_prefix is not None:
-                    template = f'{self.template_prefix}/{name}.j2.jade'
+                    template = f"{self.template_prefix}/{name}.j2.jade"
                 else:
-                    template = f'{name}.j2.jade'
+                    template = f"{name}.j2.jade"
                 return self.render_template(template)
 
             fragment_method._fragment = True
@@ -230,11 +259,12 @@ class Cell(metaclass=CellMeta):
         `fragment = Cell.template_fragment('name')`
         creates a method that renders the template `{template_prefix}/name.j2.jade`
         """
+
         def fragment_method(self) -> str:
             if self.template_prefix is not None:
-                template = f'{self.template_prefix}/{template_name}.j2.jade'
+                template = f"{self.template_prefix}/{template_name}.j2.jade"
             else:
-                template = f'{name}.j2.jade'
+                template = f"{name}.j2.jade"
             return self.render_template(template)
 
         fragment_method._fragment = True
@@ -254,17 +284,16 @@ class Cell(metaclass=CellMeta):
 
     @cached_property
     def edit_url(self) -> str:
-        return self.link(self._model, '+edit')
+        return self.link(self._model, "+edit")
 
     @cached_property
     def new_url(self) -> str:
-        return self.link(self._model, '+new')
+        return self.link(self._model, "+new")
 
     # magic starts here...
 
     def __getattribute__(self, name):
-        """
-        """
+        """ """
         try:
             ret = object.__getattribute__(self, name)
         except Exception as e:
@@ -304,7 +333,7 @@ class JinjaCellContext(jinja2.runtime.Context):
 
     def __init__(self, environment, parent, name, blocks, globals):
         super().__init__(environment, parent, name, blocks, globals)
-        self._cell = parent.get('_cell')
+        self._cell = parent.get("_cell")
 
     def resolve_or_missing(self, key):
         resolved = super().resolve_or_missing(key)
@@ -322,7 +351,6 @@ class JinjaCellContext(jinja2.runtime.Context):
 
         return resolved
 
-
     def __contains__(self, name):
         if self._cell and name in self._cell:
             return True
@@ -334,4 +362,5 @@ class JinjaCellEnvironment(jinja2.Environment):
     """
     Example jinja environment class which uses the JinjaCellContext
     """
+
     context_class = JinjaCellContext
