@@ -5,7 +5,7 @@ let
   sources_ = if (sources == null) then import ./sources.nix else sources;
   pkgs = import sources_.nixpkgs { };
   poetry2nix = pkgs.callPackage sources_.poetry2nix {};
-  python = pkgs.python39;
+  python = pkgs.python310;
 
   poetryWrapper = with python.pkgs; pkgs.writeScriptBin "poetry" ''
     export PYTHONPATH=
@@ -20,9 +20,14 @@ let
           propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.pbr ];
         }
       );
-      iso8601 = super.iso8601.overridePythonAttrs (
+      pypugjs = super.pypugjs.overridePythonAttrs (
         old: {
-          propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.poetry ];
+          doCheck = false;
+          format = "setuptools";
+          propagatedBuildInputs = old.propagatedBuildInputs ++ [
+            self.poetry
+            self.coverage
+          ];
         }
       );
     });

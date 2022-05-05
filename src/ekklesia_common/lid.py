@@ -30,11 +30,11 @@ class LID:
 
         if lid is None:
             milliseconds = int(time.time() * 1000)
-            rand = random.randrange(0, 2**22)
+            rand = random.randrange(0, 2 ** 22)
             lid = (milliseconds << 22) | rand
         else:
             milliseconds = lid >> 22
-            rand = lid & (2**22 - 1)
+            rand = lid & (2 ** 22 - 1)
 
         ts_repr = encode_timestamp(milliseconds)
         rand_repr = encode_random(rand)

@@ -8,19 +8,14 @@ import case_conversion
 from jinja2 import PackageLoader, PrefixLoader, Undefined
 from jinja2.filters import pass_context
 from markupsafe import Markup
-from pyjade.ext.jinja import Compiler as JinjaCompiler
-from pyjade.ext.jinja import PyJadeExtension as JinjaJadeExtension
-from pyjade.utils import process
+import pypugjs.utils
+import pypugjs.ext.jinja
 from werkzeug.datastructures import ImmutableDict
 
 from ekklesia_common import md
 
 
-class JinjaAutoescapeCompiler(JinjaCompiler):
-    autocloseCode = "if,for,block,filter,autoescape,with,trans,spaceless,comment,cache,macro,localize,compress,call".split(
-        ","
-    )
-
+class JinjaAutoescapeCompiler(pypugjs.ext.jinja.Compiler):
     def visitCode(self, code):
         if code.buffer:
             val = code.val.lstrip()
@@ -35,22 +30,26 @@ class JinjaAutoescapeCompiler(JinjaCompiler):
             self.visit(code.block)
             if not code.buffer:
                 codeTag = code.val.strip().split(" ", 1)[0]
-                if codeTag in self.autocloseCode:
+                if codeTag in self.auto_close_code:
                     self.buf.append("{%% end%s %%}" % codeTag)
 
 
-class PyJadeExtensionForBabel(JinjaJadeExtension):
+class PugExtensionForBabel(pypugjs.ext.jinja.PyPugJSExtension):
     def preprocess(self, source, name, filename=None):
-        return process(
+        return pypugjs.utils.process(
             source, filename=name, compiler=JinjaAutoescapeCompiler, **self.options
         )
 
 
-class PyJadeExtension(JinjaJadeExtension):
+class PugExtension(pypugjs.ext.jinja.PyPugJSExtension):
+
+    file_extensions = [".jade", ".pug"]
+
     def preprocess(self, source, name, filename=None):
-        if not name or (name and not os.path.splitext(name)[1] in self.file_extensions):
+        if not name or (name and not os.path.splitext(name)[1] in
+                                     PugExtension.file_extensions):
             return source
-        jinja_code = process(
+        jinja_code = pypugjs.utils.process(
             source, filename=name, compiler=JinjaAutoescapeCompiler, **self.options
         )
         return jinja_code
@@ -64,7 +63,7 @@ def select_jinja_autoescape(filename):
     """
     if filename is None:
         return False
-    return filename.endswith((".html", ".htm", ".xml", ".xhtml", ".jade"))
+    return filename.endswith((".html", ".htm", ".xml", ".xhtml", ".jade", ".pug"))
 
 
 def format_datetime(timestamp_or_dt: Union[float, datetime]) -> str:
@@ -138,7 +137,7 @@ def make_jinja_env(jinja_environment_class, jinja_options, app):
     }
 
     default_jinja_options = ImmutableDict(
-        extensions=[PyJadeExtension, "jinja2.ext.autoescape", "jinja2.ext.i18n"],
+        extensions=[PugExtension, "jinja2.ext.autoescape", "jinja2.ext.i18n"],
         autoescape=select_jinja_autoescape,
     )
 
