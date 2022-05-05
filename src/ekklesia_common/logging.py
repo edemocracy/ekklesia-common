@@ -67,7 +67,7 @@ def _get_exception_data(exc: BaseException):
         }
 
 
-def _exception_data_and_traceback(exc: Exception) -> dict[str, str]:
+def _exception_data_and_traceback(exc: BaseException) -> dict[str, str]:
     exception_class = type(exc)
     data = {"exception": exception_class.__module__ + "." + exception_class.__name__}
 
@@ -85,7 +85,7 @@ def _exception_data_and_traceback(exc: Exception) -> dict[str, str]:
     return data
 
 
-def _add_exception_data_and_traceback(exc: Exception):
+def _add_exception_data_and_traceback(exc: BaseException):
     try:
         event_dict = _exception_data_and_traceback(exc)
         if exc.__cause__:
@@ -98,7 +98,10 @@ def _add_exception_data_and_traceback(exc: Exception):
 
     except Exception as e:
         return {
-            "log_error": "While trying to extract and format exception metadata, another exception occurred",
+            "log_error": (
+                "While trying to extract and format exception metadata, another "
+                "exception occurred"
+            ),
             "log_error_msg": f"{type(e).__name__}: {e}",
             "log_error_traceback": _format_traceback(e.__traceback__),
         }

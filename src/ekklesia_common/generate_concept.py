@@ -5,7 +5,6 @@ The script must be run from the project's root dir, for example:
 
     python ../ekklesia-common/cookiecutter/concept/generate.py my_concept
 """
-import os
 import sys
 from pathlib import Path
 
@@ -22,11 +21,12 @@ def main():
         raise Exception("expected one argument: concept name is missing!")
 
     candidate_app_packages = [
-        p for p in Path.cwd().glob("src/ekklesia_*") if not "." in p.name
+        p for p in Path.cwd().glob("src/ekklesia_*") if "." not in p.name
     ]
     if not candidate_app_packages:
         raise Exception(
-            "app package in src cannot be found. Did you run the script from the root directory of a ekklesia project?"
+            "app package in src cannot be found. Did you run the script from the root "
+            "directory of a ekklesia project?"
         )
     if len(candidate_app_packages) > 1:
         raise Exception("Multiple candidates for the app package in src!")
@@ -57,7 +57,8 @@ def main():
     )
 
     print(
-        f"generated concept {concepts_package / concept_name}, tests are located at tests/concepts/{concept_name}"
+        f"generated concept {concepts_package / concept_name}, tests are located at "
+        f"tests/concepts/{concept_name}"
     )
 
 

@@ -2,18 +2,16 @@ import dataclasses
 import logging
 from dataclasses import dataclass
 from functools import cached_property, partial
-from typing import List, NewType, Optional
+from typing import List, Optional
 from urllib.parse import quote, unquote
 
 import dectate
-from eliot import start_task
 from morepath import App, redirect
 from requests_oauthlib import OAuth2Session
 from sqlalchemy import JSON, DateTime, Integer, Text, func
 from webob.exc import HTTPForbidden
 
 from ekklesia_common.database import FK, Base, C, bref, rel
-from ekklesia_common.enums import EkklesiaUserType
 
 logg = logging.getLogger(__name__)
 
@@ -46,7 +44,8 @@ class EkklesiaAuthData:
 
 
 class EkklesiaAuth:
-    """Wraps the OAuth2 session and provides helpers for Ekklesia ID server API access."""
+    """Wraps the OAuth2 session and provides helpers for Ekklesia ID server API access.
+    """
 
     def __init__(self, settings, token=None, get_token=None, set_token=None):
         self.settings = settings
@@ -105,7 +104,7 @@ class GetOAuthTokenAction(dectate.Action):
     app_class_arg = True
 
     def __init__(self):
-        pass
+        super().__init__()
 
     def identifier(self, **_kw):
         return ()
@@ -116,9 +115,6 @@ class GetOAuthTokenAction(dectate.Action):
 
 class SetOAuthTokenAction(dectate.Action):
     app_class_arg = True
-
-    def __init__(self):
-        pass
 
     def identifier(self, **_kw):
         return ()
@@ -132,6 +128,7 @@ class AfterAuthAction(dectate.Action):
     config = {"after_oauth_callbacks": dict}
 
     def __init__(self, name=None):
+        super().__init__()
         self.name = name
 
     def identifier(self, **_kw):
@@ -163,14 +160,15 @@ class EkklesiaAuthApp(App):
 
 @EkklesiaAuthApp.setting_section(section="ekklesia_auth")
 def ekklesia_auth_setting_section():
+    base_url = "https://id-server.invalid/auth/realms/test/protocol/openid-connect"
     return {
         "enabled": False,
         "client_id": "",
         "client_secret": "",
-        "authorization_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/auth",
-        "token_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/token",
-        "userinfo_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/userinfo",
-        "logout_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/logout",
+        "authorization_url": f"{base_url}/auth",
+        "token_url": f"{base_url}/token",
+        "userinfo_url": f"{base_url}/userinfo",
+        "logout_url": f"{base_url}/logout",
         "display_name": "Ekklesia Login",
         "required_role_for_login": None,
     }
@@ -250,6 +248,7 @@ class OAuthCallback:
         self.back_url = back_url
         self.called_url = request.url
         self.oauth_state = self.session.pop("oauth_state")
+        self.token = None
 
     @cached_property
     def oauth(self):

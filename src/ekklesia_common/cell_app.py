@@ -26,6 +26,7 @@ class CellAction(dectate.Action):
     app_class_arg = True
 
     def __init__(self, model=None, name="", permission=None, **predicates):
+        super().__init__()
         self.model = model
         self.name = name
         self.permission = permission

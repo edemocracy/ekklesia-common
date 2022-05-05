@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import inspect
 import os.path
 from functools import cached_property
@@ -34,9 +32,9 @@ class CellMeta(type):
             else:
                 cls.template_prefix = None
 
-        return super().__init__(name, bases, attrs)
+        super().__init__(name, bases, attrs)
 
-    def __new__(meta, name, bases, dct):
+    def __new__(mcs, name, bases, dct):
         # only for subclasses, not for Cell class
         if bases:
             for k, v in dct.items():
@@ -49,7 +47,7 @@ class CellMeta(type):
                     # turn functions with single argument (self) into cached properties
                     dct[k] = cached_property(v)
 
-        return super().__new__(meta, name, bases, dct)
+        return super().__new__(mcs, name, bases, dct)
 
 
 class CellAttributeAccessError(Exception):
@@ -57,7 +55,10 @@ class CellAttributeAccessError(Exception):
         cell_type = type(cell).__name__
         self.cell_type = cell_type
         self.attribute_name = attribute_name
-        msg = f"{cell_type}.{attribute_name} raised {type(exception).__name__}: {exception}"
+        msg = (
+            f"{cell_type}.{attribute_name} raised {type(exception).__name__}: "
+            f"{exception}"
+        )
         super().__init__(msg)
 
 
@@ -107,7 +108,8 @@ class Cell(metaclass=CellMeta):
         self.collection = collection
         self._template_path = template_path
         self.options = options
-        # if no parent is set, the layout is enabled by default. This can be overriden by the `layout` arg
+        # if no parent is set, the layout is enabled by default.
+        # This can be overridden by the `layout` arg.
         if layout is not None:
             self.layout = layout
         elif parent is None:
@@ -165,7 +167,8 @@ class Cell(metaclass=CellMeta):
 
     def cell(self, model, layout: bool = None, view_name="", **options) -> "Cell":
         """Look up a cell by model and create an instance.
-        The parent cell is set to self which also means that it will be rendered without layout by default.
+        The parent cell is set to self which also means that it will be rendered without
+        layout by default.
         """
         cell_class = self._get_cell_class(model, view_name)
         return cell_class(
@@ -182,7 +185,8 @@ class Cell(metaclass=CellMeta):
         **options,
     ) -> str:
         """Look up a cell by model and render it to HTML.
-        The parent cell is set to self which also means that it will be rendered without layout by default.
+        The parent cell is set to self which also means that it will be rendered without
+        layout by default.
         """
         view_method_name = view_name if view_name is not None else "show"
         if collection is not None:
@@ -200,7 +204,8 @@ class Cell(metaclass=CellMeta):
 
                 if not callable(view_method):
                     raise ValueError(
-                        f"view method '{view_method_name}' of {item} is not callable, it is: {view_method}"
+                        f"view method '{view_method_name}' of {item} is not callable, "
+                        f"it is: {view_method}"
                     )
 
                 parts.append(view_method())
@@ -216,7 +221,8 @@ class Cell(metaclass=CellMeta):
             )
             if not callable(view_method):
                 raise ValueError(
-                    f"view method '{view_method_name}' of {model} is not callable, it is: {view_method}"
+                    f"view method '{view_method_name}' of {model} is not callable, it "
+                    f"is: {view_method}"
                 )
             return view_method()
 
@@ -264,7 +270,7 @@ class Cell(metaclass=CellMeta):
             if self.template_prefix is not None:
                 template = f"{self.template_prefix}/{template_name}.j2.jade"
             else:
-                template = f"{name}.j2.jade"
+                template = f"{template_name}.j2.jade"
             return self.render_template(template)
 
         fragment_method._fragment = True
@@ -328,7 +334,8 @@ class Cell(metaclass=CellMeta):
 
 class JinjaCellContext(jinja2.runtime.Context):
     """
-    Custom jinja context with the ability to look up template variables in a cell (view model)
+    Custom jinja context with the ability to look up template variables in a cell
+    (view model)
     """
 
     def __init__(self, environment, parent, name, blocks, globals):

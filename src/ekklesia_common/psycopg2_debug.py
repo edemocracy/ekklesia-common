@@ -21,7 +21,7 @@ DEFAULT_PYGMENTS_STYLE = "native"
 def _make_statement_formatter(
     show_time, highlight, pygments_style, prefix=None, formatter_cls=None
 ):
-    def format_stmt(sql, timestamp=0, duration=0):
+    def format_stmt(sql, timestamp=0, duration=0.0):
         if show_time:
             msg = "{:.2f} ({:.2f}ms): {}".format(
                 timestamp, duration * 1000, sql.strip()
@@ -68,7 +68,8 @@ class StatementEntry:
 
 class StatementHistory(object):
     """
-    Keeps a history of SQL statements with execution time and offers some pretty printing options.
+    Keeps a history of SQL statements with execution time and offers some pretty
+    printing options.
     """
 
     entries: list[StatementEntry]
@@ -103,7 +104,7 @@ class StatementHistory(object):
         stmt,
         highlight=True,
         time=0,
-        duration=0,
+        duration=0.0,
         pygments_style=DEFAULT_PYGMENTS_STYLE,
         prefix=None,
         formatter_cls=None,
@@ -170,7 +171,9 @@ class DebugCursor(_cursor):
 
 
 def make_debug_connection_factory():
-    """Creates a DebugConnection which can be used as connection_factory for Psycopg2.connect()"""
+    """Creates a DebugConnection which can be used as connection_factory for
+    Psycopg2.connect()
+    """
 
     class DebugConnection(_connection):
         """Psycopg2 connection which keeps a history of SQL statements and logs them.

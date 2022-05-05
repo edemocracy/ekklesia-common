@@ -1,6 +1,5 @@
 import json
 from functools import wraps
-from itertools import tee
 
 import colander
 import dectate
@@ -150,8 +149,6 @@ class Form(deform.Form):
             else:
                 translated = domain.gettext(term)
                 return term.interpolate(translated)
-
-            return domain.gettext(term)
 
         renderer = deform.ZPTRendererFactory(
             self.__class__.deform_template_dirs, translator=translator

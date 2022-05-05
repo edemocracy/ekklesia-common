@@ -14,7 +14,10 @@ class RenderTemplateError(Exception):
     def __init__(self, template_name, cause) -> None:
         self.template_name = template_name
         cause_type = type(cause).__name__
-        msg = f"Template {template_name} could not be rendered because of an exception: {cause_type}: {cause}"
+        msg = (
+            f"Template {template_name} could not be rendered because of an exception: "
+            f"{cause_type}: {cause}"
+        )
         super().__init__(msg)
 
 

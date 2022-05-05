@@ -1,6 +1,5 @@
 import json
 import time
-from urllib.parse import urljoin
 
 import morepath
 import responses

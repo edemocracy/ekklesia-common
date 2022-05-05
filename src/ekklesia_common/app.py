@@ -3,7 +3,7 @@ from datetime import datetime
 from functools import cached_property
 
 import morepath
-from eliot import log_message, start_task
+from eliot import start_task
 from more.babel_i18n import BabelApp
 from more.browser_session import BrowserSessionApp
 from more.forwarded import ForwardedApp
@@ -22,6 +22,8 @@ from ekklesia_common.lid import LID
 from ekklesia_common.permission import WritePermission
 from ekklesia_common.request import EkklesiaRequest
 from ekklesia_common.templating import make_jinja_env, make_template_loader
+
+SQL_PRINT_PREFIX = "sql>"
 
 
 class EkklesiaBrowserApp(
@@ -134,7 +136,8 @@ def make_ekklesia_log_tween(app: EkklesiaBrowserApp, handler):
                     print(f"{SQL_PRINT_PREFIX}SQL statements for this request")
                     history.print_statements(prefix=SQL_PRINT_PREFIX)
                     print(
-                        f"{SQL_PRINT_PREFIX}{len(history)} SQL statements, duration {history.overall_duration_ms():.2f}ms"
+                        f"{SQL_PRINT_PREFIX}{len(history)} SQL statements, duration "
+                        f"{history.overall_duration_ms():.2f}ms"
                     )
                     print()
                 return response
@@ -142,7 +145,8 @@ def make_ekklesia_log_tween(app: EkklesiaBrowserApp, handler):
                 # Let Morepath handle this (exception views).
                 raise
             except Exception as e:
-                # Something else failed, wrap the exception and add metadata for better error reporting.
+                # Something else failed, wrap the exception and add metadata for
+                # better error reporting.
                 datetime_now = datetime.now()
                 suffix = task.task_uuid[:7]
                 xid = exception_uid(e, datetime_now, suffix)
@@ -165,14 +169,3 @@ def make_ekklesia_customizations_tween(app, handler):
 @EkklesiaBrowserApp.converter(type=LID)
 def convert_lid():
     return morepath.Converter(lambda s: LID.from_str(s), lambda l: str(l))
-
-
-def get_locale(request):
-    locale = request.browser_session.get("lang")
-    if locale:
-        logg.debug("locale from session: %s", locale)
-    else:
-        locale = request.accept_language.best_match(["de", "en", "fr"])
-        logg.debug("locale from request: %s", locale)
-
-    return locale

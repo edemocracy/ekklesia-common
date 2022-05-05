@@ -1,4 +1,3 @@
-import inspect
 import sys
 from functools import wraps
 from typing import get_type_hints
@@ -14,6 +13,7 @@ class ConceptAction(dectate.Action):
     config = {"concepts": dict}
 
     def __init__(self, name):
+        super().__init__()
         self.name = name
 
     def identifier(self, **_kw):
