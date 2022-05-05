@@ -1,11 +1,8 @@
 import inspect
 from unittest.mock import Mock
 
-from munch import Munch
 from pytest import fixture, raises
-from webob.request import BaseRequest
 
-import ekklesia_common.cell
 from ekklesia_common.app import make_jinja_env
 from ekklesia_common.cell import (
     Cell,
@@ -13,7 +10,6 @@ from ekklesia_common.cell import (
     JinjaCellContext,
     JinjaCellEnvironment,
 )
-from ekklesia_common.request import EkklesiaRequest
 
 
 @fixture
@@ -163,11 +159,13 @@ def test_cell_render_cell(cell, model):
 
 
 def test_cell_render_cell_shows_error_if_view_method_not_callable(cell, model):
-    with raises(ValueError) as e:
+    expected_msg = (
+        f"view method 'cannot_call_this' of {model} is not callable, it is: None"
+    )
+    with raises(ValueError) as exc_info:
         cell.render_cell(model, "cannot_call_this")
 
-    assert "cannot_call_this" in str(e)
-    assert "TestModel" in str(e)
+    assert str(exc_info.value) == expected_msg
 
 
 def test_cell_render_cell_fragment(cell, model):
@@ -192,11 +190,13 @@ def test_cell_render_cell_collection_view_method_not_callable(cell, model):
     model2 = model.copy()
     model2.title = "test2"
     models = [model, model2]
-    with raises(ValueError) as e:
+    expected_msg = (
+        f"view method 'cannot_call_this' of {model} is not callable, it is: None"
+    )
+    with raises(ValueError) as exc_info:
         cell.render_cell(collection=models, view_name="cannot_call_this")
 
-    assert "cannot_call_this" in str(e)
-    assert "TestModel" in str(e)
+    assert str(exc_info.value) == expected_msg
 
 
 def test_cell_render_cell_model_and_collection_not_allowed(cell, model):
@@ -218,14 +218,22 @@ def test_context_resolve_or_missing(context):
 
 
 def test_context_resolve_or_missing_raises_exception_for_inexistent(context):
-    with raises(CellAttributeNotFound) as excinfo:
+    expected_msg = (
+        "TestCell has no attribute 'does_not_exist'. Is it from the model? Did you "
+        "forget to add it to 'model_properties'?"
+    )
+    with raises(CellAttributeNotFound) as exc_info:
         context.resolve_or_missing("does_not_exist")
 
-    assert "does_not_exist" in str(excinfo.value)
+    assert str(exc_info.value) == expected_msg
 
 
 def test_context_resolve_or_missing_raises_exception_for_private(context):
-    with raises(CellAttributeNotFound) as excinfo:
+    expected_msg = (
+        "TestCell has no attribute 'private'. Is it from the model? Did you forget to "
+        "add it to 'model_properties'?"
+    )
+    with raises(CellAttributeNotFound) as exc_info:
         context.resolve_or_missing("private")
 
-    assert "private" in str(excinfo.value)
+    assert str(exc_info.value) == expected_msg
