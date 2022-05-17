@@ -6,7 +6,7 @@ from typing import Union
 
 import case_conversion
 from jinja2 import PackageLoader, PrefixLoader, Undefined
-from jinja2.filters import contextfilter
+from jinja2.filters import pass_context
 from markupsafe import Markup
 from pyjade.ext.jinja import Compiler as JinjaCompiler
 from pyjade.ext.jinja import PyJadeExtension as JinjaJadeExtension
@@ -75,7 +75,7 @@ def format_datetime(timestamp_or_dt: Union[float, datetime]) -> str:
         return datetime.utcfromtimestamp(timestamp_or_dt).strftime("%Y-%m-%d @ %H:%M")
 
 
-@contextfilter
+@pass_context
 def yesno(context, val):
     request = context.get("_request")
     _ = request.i18n.gettext
@@ -86,7 +86,7 @@ def yesno(context, val):
         return _("No")
 
 
-@contextfilter
+@pass_context
 def enum_value(context, instance):
     request = context.get("_request")
     _ = request.i18n.gettext
@@ -117,7 +117,7 @@ def make_jinja_env(jinja_environment_class, jinja_options, app):
             func = getattr(request.i18n, func_name)
             return func(value)
 
-        f = contextfilter(babel_filter_wrapper)
+        f = pass_context(babel_filter_wrapper)
         f.__name__ = func_name
         return f
 
