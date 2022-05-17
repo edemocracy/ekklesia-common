@@ -23,6 +23,8 @@ from ekklesia_common.permission import WritePermission
 from ekklesia_common.request import EkklesiaRequest
 from ekklesia_common.templating import make_jinja_env, make_template_loader
 
+SQL_PRINT_PREFIX = "sql>"
+
 
 class EkklesiaBrowserApp(
     BabelApp,
@@ -134,7 +136,8 @@ def make_ekklesia_log_tween(app: EkklesiaBrowserApp, handler):
                     print(f"{SQL_PRINT_PREFIX}SQL statements for this request")
                     history.print_statements(prefix=SQL_PRINT_PREFIX)
                     print(
-                        f"{SQL_PRINT_PREFIX}{len(history)} SQL statements, duration {history.overall_duration_ms():.2f}ms"
+                        f"{SQL_PRINT_PREFIX}{len(history)} SQL statements, duration "
+                        f"{history.overall_duration_ms():.2f}ms"
                     )
                     print()
                 return response
