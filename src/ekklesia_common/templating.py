@@ -149,7 +149,8 @@ def make_jinja_env(jinja_environment_class, jinja_options, app):
     jinja_env.filters["enum_value"] = enum_value
 
     def jinja_ngettext(s, p, n):
-        # using the translation for zero is better than throwing an exception when the number is undefined, I think
+        # using the translation for zero is better than throwing an exception when
+        # the number is undefined, I think
         if isinstance(n, Undefined):
             n = 0
         return app.babel.domain.get_translations().ungettext(s, p, n)

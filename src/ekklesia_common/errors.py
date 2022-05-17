@@ -5,7 +5,8 @@ def exception_uid(exception: Exception, dt: datetime, suffix: str):
     import hashlib
     import traceback
 
-    """Builds a unique string (exception UID) that may be exposed to the user without revealing to much.
+    """Builds a unique string (exception UID) that may be exposed to the user without
+    revealing too much.
     """
     dt_str = dt.strftime("%Y_%m_%dT%H_%M_%S")
     error_msg = str(exception)

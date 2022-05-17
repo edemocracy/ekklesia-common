@@ -25,7 +25,8 @@ def main():
     ]
     if not candidate_app_packages:
         raise Exception(
-            "app package in src cannot be found. Did you run the script from the root directory of a ekklesia project?"
+            "app package in src cannot be found. Did you run the script from the root "
+            "directory of a ekklesia project?"
         )
     if len(candidate_app_packages) > 1:
         raise Exception("Multiple candidates for the app package in src!")
@@ -56,7 +57,8 @@ def main():
     )
 
     print(
-        f"generated concept {concepts_package / concept_name}, tests are located at tests/concepts/{concept_name}"
+        f"generated concept {concepts_package / concept_name}, tests are located at "
+        f"tests/concepts/{concept_name}"
     )
 
 

@@ -44,7 +44,8 @@ class EkklesiaAuthData:
 
 
 class EkklesiaAuth:
-    """Wraps the OAuth2 session and provides helpers for Ekklesia ID server API access."""
+    """Wraps the OAuth2 session and provides helpers for Ekklesia ID server API access.
+    """
 
     def __init__(self, settings, token=None, get_token=None, set_token=None):
         self.settings = settings
@@ -161,14 +162,15 @@ class EkklesiaAuthApp(App):
 
 @EkklesiaAuthApp.setting_section(section="ekklesia_auth")
 def ekklesia_auth_setting_section():
+    base_url = "https://id-server.invalid/auth/realms/test/protocol/openid-connect"
     return {
         "enabled": False,
         "client_id": "",
         "client_secret": "",
-        "authorization_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/auth",
-        "token_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/token",
-        "userinfo_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/userinfo",
-        "logout_url": "https://identity-server.invalid/auth/realms/test/protocol/openid-connect/logout",
+        "authorization_url": f"{base_url}/auth",
+        "token_url": f"{base_url}/token",
+        "userinfo_url": f"{base_url}/userinfo",
+        "logout_url": f"{base_url}/logout",
         "display_name": "Ekklesia Login",
         "required_role_for_login": None,
     }

@@ -68,7 +68,8 @@ class StatementEntry:
 
 class StatementHistory(object):
     """
-    Keeps a history of SQL statements with execution time and offers some pretty printing options.
+    Keeps a history of SQL statements with execution time and offers some pretty
+    printing options.
     """
 
     entries: list[StatementEntry]
@@ -170,7 +171,9 @@ class DebugCursor(_cursor):
 
 
 def make_debug_connection_factory():
-    """Creates a DebugConnection which can be used as connection_factory for Psycopg2.connect()"""
+    """Creates a DebugConnection which can be used as connection_factory for
+    Psycopg2.connect()
+    """
 
     class DebugConnection(_connection):
         """Psycopg2 connection which keeps a history of SQL statements and logs them.

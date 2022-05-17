@@ -145,7 +145,8 @@ def make_ekklesia_log_tween(app: EkklesiaBrowserApp, handler):
                 # Let Morepath handle this (exception views).
                 raise
             except Exception as e:
-                # Something else failed, wrap the exception and add metadata for better error reporting.
+                # Something else failed, wrap the exception and add metadata for
+                # better error reporting.
                 datetime_now = datetime.now()
                 suffix = task.task_uuid[:7]
                 xid = exception_uid(e, datetime_now, suffix)

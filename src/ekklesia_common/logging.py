@@ -98,7 +98,10 @@ def _add_exception_data_and_traceback(exc: Exception):
 
     except Exception as e:
         return {
-            "log_error": "While trying to extract and format exception metadata, another exception occurred",
+            "log_error": (
+                "While trying to extract and format exception metadata, another "
+                "exception occurred"
+            ),
             "log_error_msg": f"{type(e).__name__}: {e}",
             "log_error_traceback": _format_traceback(e.__traceback__),
         }
