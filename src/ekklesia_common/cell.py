@@ -262,7 +262,7 @@ class Cell(metaclass=CellMeta):
             if self.template_prefix is not None:
                 template = f"{self.template_prefix}/{template_name}.j2.jade"
             else:
-                template = f"{name}.j2.jade"
+                template = f"{template_name}.j2.jade"
             return self.render_template(template)
 
         fragment_method._fragment = True
