@@ -3,7 +3,7 @@ from datetime import datetime
 from functools import cached_property
 
 import morepath
-from eliot import log_message, start_task
+from eliot import start_task
 from more.babel_i18n import BabelApp
 from more.browser_session import BrowserSessionApp
 from more.forwarded import ForwardedApp

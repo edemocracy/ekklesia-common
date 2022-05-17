@@ -12,7 +12,6 @@ import sys
 import sysconfig
 import traceback
 import typing as t
-from functools import cached_property
 from html import escape
 from tokenize import TokenError
 from types import CodeType, TracebackType

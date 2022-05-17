@@ -5,7 +5,6 @@ The script must be run from the project's root dir, for example:
 
     python ../ekklesia-common/cookiecutter/concept/generate.py my_concept
 """
-import os
 import sys
 from pathlib import Path
 

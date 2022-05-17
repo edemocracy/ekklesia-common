@@ -1,6 +1,5 @@
 import json
 from functools import wraps
-from itertools import tee
 
 import colander
 import dectate

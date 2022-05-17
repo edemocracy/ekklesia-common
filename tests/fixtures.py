@@ -1,7 +1,6 @@
 import logging
 import os.path
 from types import SimpleNamespace as N
-from unittest.mock import Mock
 
 import morepath
 from morepath.request import BaseRequest

@@ -1,4 +1,3 @@
-import inspect
 import sys
 from functools import wraps
 from typing import get_type_hints

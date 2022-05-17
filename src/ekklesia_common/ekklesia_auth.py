@@ -2,18 +2,16 @@ import dataclasses
 import logging
 from dataclasses import dataclass
 from functools import cached_property, partial
-from typing import List, NewType, Optional
+from typing import List, Optional
 from urllib.parse import quote, unquote
 
 import dectate
-from eliot import start_task
 from morepath import App, redirect
 from requests_oauthlib import OAuth2Session
 from sqlalchemy import JSON, DateTime, Integer, Text, func
 from webob.exc import HTTPForbidden
 
 from ekklesia_common.database import FK, Base, C, bref, rel
-from ekklesia_common.enums import EkklesiaUserType
 
 logg = logging.getLogger(__name__)
 
