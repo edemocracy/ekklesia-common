@@ -21,7 +21,7 @@ DEFAULT_PYGMENTS_STYLE = "native"
 def _make_statement_formatter(
     show_time, highlight, pygments_style, prefix=None, formatter_cls=None
 ):
-    def format_stmt(sql, timestamp=0, duration=0):
+    def format_stmt(sql, timestamp=0, duration=0.0):
         if show_time:
             msg = "{:.2f} ({:.2f}ms): {}".format(
                 timestamp, duration * 1000, sql.strip()
@@ -104,7 +104,7 @@ class StatementHistory(object):
         stmt,
         highlight=True,
         time=0,
-        duration=0,
+        duration=0.0,
         pygments_style=DEFAULT_PYGMENTS_STYLE,
         prefix=None,
         formatter_cls=None,

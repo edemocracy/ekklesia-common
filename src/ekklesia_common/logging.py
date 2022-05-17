@@ -67,7 +67,7 @@ def _get_exception_data(exc: BaseException):
         }
 
 
-def _exception_data_and_traceback(exc: Exception) -> dict[str, str]:
+def _exception_data_and_traceback(exc: BaseException) -> dict[str, str]:
     exception_class = type(exc)
     data = {"exception": exception_class.__module__ + "." + exception_class.__name__}
 
@@ -85,7 +85,7 @@ def _exception_data_and_traceback(exc: Exception) -> dict[str, str]:
     return data
 
 
-def _add_exception_data_and_traceback(exc: Exception):
+def _add_exception_data_and_traceback(exc: BaseException):
     try:
         event_dict = _exception_data_and_traceback(exc)
         if exc.__cause__:

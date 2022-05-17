@@ -104,7 +104,7 @@ class GetOAuthTokenAction(dectate.Action):
     app_class_arg = True
 
     def __init__(self):
-        pass
+        super().__init__()
 
     def identifier(self, **_kw):
         return ()
@@ -115,9 +115,6 @@ class GetOAuthTokenAction(dectate.Action):
 
 class SetOAuthTokenAction(dectate.Action):
     app_class_arg = True
-
-    def __init__(self):
-        pass
 
     def identifier(self, **_kw):
         return ()
@@ -131,6 +128,7 @@ class AfterAuthAction(dectate.Action):
     config = {"after_oauth_callbacks": dict}
 
     def __init__(self, name=None):
+        super().__init__()
         self.name = name
 
     def identifier(self, **_kw):
@@ -250,6 +248,7 @@ class OAuthCallback:
         self.back_url = back_url
         self.called_url = request.url
         self.oauth_state = self.session.pop("oauth_state")
+        self.token = None
 
     @cached_property
     def oauth(self):

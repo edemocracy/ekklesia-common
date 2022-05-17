@@ -21,7 +21,7 @@ def main():
         raise Exception("expected one argument: concept name is missing!")
 
     candidate_app_packages = [
-        p for p in Path.cwd().glob("src/ekklesia_*") if not "." in p.name
+        p for p in Path.cwd().glob("src/ekklesia_*") if "." not in p.name
     ]
     if not candidate_app_packages:
         raise Exception(

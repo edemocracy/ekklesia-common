@@ -13,6 +13,7 @@ class ConceptAction(dectate.Action):
     config = {"concepts": dict}
 
     def __init__(self, name):
+        super().__init__()
         self.name = name
 
     def identifier(self, **_kw):

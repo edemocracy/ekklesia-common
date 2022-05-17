@@ -27,7 +27,7 @@ parser.add_argument(
     "-s",
     "--stackdump",
     action="store_true",
-    help=f"write stackdumps to temp dir {tmpdir} on SIGQUIT",
+    help=f"write stack dumps to temp dir {tmpdir} on SIGQUIT",
 )
 parser.add_argument(
     "-c", "--config-file", help=f"path to config file in YAML / JSON format"
@@ -55,9 +55,9 @@ def stackdump_setup():
             "IPython installed, write stack dumps to tmpdir with: `kill -QUIT <ekklesia_common_pid>`"
         )
 
-        def dumpstacks(signal, frame):
+        def dump_stacks(signal, frame):
             print("dumping stack")
-            filepath = os.path.join(tmpdir, "ekklesia_common_threadstatus")
+            filepath = os.path.join(tmpdir, "ekklesia_common_thread_status")
             id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
             full = ["-" * 80]
             tb_formatter = ultratb.ListTB(color_scheme="Linux")
@@ -87,7 +87,7 @@ def stackdump_setup():
 
         import signal
 
-        signal.signal(signal.SIGQUIT, dumpstacks)
+        signal.signal(signal.SIGQUIT, dump_stacks)
 
 
 def run():

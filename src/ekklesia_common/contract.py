@@ -150,8 +150,6 @@ class Form(deform.Form):
                 translated = domain.gettext(term)
                 return term.interpolate(translated)
 
-            return domain.gettext(term)
-
         renderer = deform.ZPTRendererFactory(
             self.__class__.deform_template_dirs, translator=translator
         )

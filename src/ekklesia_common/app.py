@@ -169,14 +169,3 @@ def make_ekklesia_customizations_tween(app, handler):
 @EkklesiaBrowserApp.converter(type=LID)
 def convert_lid():
     return morepath.Converter(lambda s: LID.from_str(s), lambda l: str(l))
-
-
-def get_locale(request):
-    locale = request.browser_session.get("lang")
-    if locale:
-        logg.debug("locale from session: %s", locale)
-    else:
-        locale = request.accept_language.best_match(["de", "en", "fr"])
-        logg.debug("locale from request: %s", locale)
-
-    return locale

@@ -32,9 +32,9 @@ class CellMeta(type):
             else:
                 cls.template_prefix = None
 
-        return super().__init__(name, bases, attrs)
+        super().__init__(name, bases, attrs)
 
-    def __new__(meta, name, bases, dct):
+    def __new__(mcs, name, bases, dct):
         # only for subclasses, not for Cell class
         if bases:
             for k, v in dct.items():
@@ -47,7 +47,7 @@ class CellMeta(type):
                     # turn functions with single argument (self) into cached properties
                     dct[k] = cached_property(v)
 
-        return super().__new__(meta, name, bases, dct)
+        return super().__new__(mcs, name, bases, dct)
 
 
 class CellAttributeAccessError(Exception):
