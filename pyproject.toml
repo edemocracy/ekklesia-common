@@ -47,6 +47,8 @@ py-gfm = "^1.0.2"
 WebTest = "^3.0.0"
 pypugjs = "^5.9.11"
 "more.browser-session" = "^22.5.1"
+Markdown = "3.3.7"
+
 
 [tool.poetry.scripts]
 ekklesia-generate-concept = 'ekklesia_common.generate_concept:main'

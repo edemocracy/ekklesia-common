@@ -6,12 +6,8 @@ let
   pkgs = import sources_.nixpkgs { };
   poetry2nix = pkgs.callPackage sources_.poetry2nix {};
   python = pkgs.python310;
+  inherit (pkgs) lib;
 
-  poetryWrapper = with python.pkgs; pkgs.writeScriptBin "poetry" ''
-    export PYTHONPATH=
-    unset SOURCE_DATE_EPOCH
-    ${poetry}/bin/poetry "$@"
-  '';
 
   overrides = poetry2nix.overrides.withDefaults (
     self: super: {
@@ -32,26 +28,27 @@ let
       );
     });
 
-in rec {
-  inherit pkgs python;
-  inherit (pkgs) lib glibcLocales;
-
-  mkPoetryApplication = { ... }@args:
-    poetry2nix.mkPoetryApplication args // {
-      inherit overrides;
-    };
-
   inherit (poetry2nix.mkPoetryPackages {
     projectDir = ../.;
     inherit python;
     inherit overrides;
-  }) poetryPackages pyProject;
+  }) poetryPackages;
 
   poetryPackagesByName =
     lib.listToAttrs
       (map
         (p: { name = p.pname or "none"; value = p; })
         poetryPackages);
+
+  poetryWrapper = pkgs.writeScriptBin "poetry" ''
+    export PYTHONPATH=
+    unset SOURCE_DATE_EPOCH
+    ${poetryPackagesByName.poetry}/bin/poetry "$@"
+  '';
+
+in rec {
+  inherit pkgs python;
+  inherit (pkgs) lib glibcLocales;
 
   # Can be imported in Python code or run directly as debug tools
   debugLibsAndTools = [
