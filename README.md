@@ -4,15 +4,18 @@ Common code for the Ekklesia e-democracy platform.
 
 ## Tech Stack
 
-* Backend: [Python 3.8](https://www.python.org)
-* Web framework: [Morepath](http://morepath.readthedocs.org )
-* Frontend:
-  [Pyjade](https://github.com/syrusakbary/pyjade) (like [Pug](https://pugjs.org)),
-  [Jinja](https://jinja.palletsprojects.com),
-  [Bootstrap 4](https://getbootstrap.com),
-  [Sass](https://sass-lang.com),
-* Database: [PostgreSQL 12](https://www.postgresql.com)
-* Package management: [Nix Package Manager](https://nixos.org/nix)
+- Backend:
+  - Main language: [Python 3.10](https://www.python.org)
+  - Web framework: [Morepath](http://morepath.readthedocs.org)
+  - Testing: [pytest](https://pytest.org),
+    [WebTest](https://docs.pylonsproject.org/projects/webtest/en/latest/)
+- Frontend
+  - Templates [PyPugJS](https://github.com/kakulukia/pypugjs) (similar to [Pug](https://pugjs.org))
+    with [Jinja](https://jinja.palletsprojects.com) as template engine.
+  - [Sass](https://sass-lang.com) Framework [Bootstrap 4](https://getbootstrap.com)
+  - [htmx](https://htmx.org) for "AJAX" requests directly from HTML.
+- Dependency management and build tool: [Nix](https://nixos.org/nix)
+
 
 ## License
 
