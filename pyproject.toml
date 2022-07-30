@@ -21,7 +21,7 @@ classifiers = [
 base32-crockford = "^0.3.0"
 case-conversion = "^2.1.0"
 cookiecutter = "^1.7.2"
-coverage = "^6.3.2"
+coverage = {extras = ["toml"], version = "^6.4.2"}
 deform = "^2.0.8"
 eliot = "^1.12.0"
 eliot-tree = "^19.0.1"
@@ -49,9 +49,46 @@ pypugjs = "^5.9.11"
 "more.browser-session" = "^22.5.1"
 Markdown = "3.3.7"
 
+[tool.coverage.report]
+skip_covered = true
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:"
+]
+
+
+[tool.coverage.run]
+source = [
+    "ekklesia_common"
+]
+omit = [
+    "src/ekklesia_common/debug/tbtools.py"
+]
+
 
 [tool.poetry.scripts]
 ekklesia-generate-concept = 'ekklesia_common.generate_concept:main'
+
+
+[tool.pytest.ini_options]
+addopts = """\
+  --show-capture=no \
+  -ra \
+  --tb=short \
+  -k "not integration" \
+  --strict-markers \
+"""
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+norecursedirs = "tests/helpers"
+testpaths = "tests"
+markers = [
+    "integration: An Integration test which is allowed to modify the test database."
+]
 
 
 [build-system]
