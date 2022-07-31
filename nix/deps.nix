@@ -13,16 +13,16 @@ let
     self: super: {
       munch = super.munch.overridePythonAttrs (
         old: {
-          propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.pbr ];
+          buildInputs = old.buildInputs ++ [ self.pbr ];
         }
       );
       pypugjs = super.pypugjs.overridePythonAttrs (
         old: {
           doCheck = false;
           format = "setuptools";
-          propagatedBuildInputs = old.propagatedBuildInputs ++ [
-            self.poetry
+          buildInputs = old.buildInputs ++ [
             self.coverage
+            poetry
           ];
         }
       );
@@ -32,7 +32,7 @@ let
     projectDir = ../.;
     inherit python;
     inherit overrides;
-  }) poetryPackages;
+  }) poetry poetryPackages;
 
   poetryPackagesByName =
     lib.listToAttrs
@@ -43,11 +43,11 @@ let
   poetryWrapper = pkgs.writeScriptBin "poetry" ''
     export PYTHONPATH=
     unset SOURCE_DATE_EPOCH
-    ${poetryPackagesByName.poetry}/bin/poetry "$@"
+    ${poetry}/bin/poetry "$@"
   '';
 
 in rec {
-  inherit pkgs python;
+  inherit pkgs python poetryPackagesByName;
   inherit (pkgs) lib glibcLocales;
 
   # Can be imported in Python code or run directly as debug tools
