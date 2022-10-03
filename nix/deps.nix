@@ -3,11 +3,17 @@ with builtins;
 
 let
   sources_ = if (sources == null) then import ./sources.nix else sources;
-  pkgs = import sources_.nixpkgs { };
-  poetry2nix = pkgs.callPackage sources_.poetry2nix {};
-  python = pkgs.python310;
-  inherit (pkgs) lib;
 
+  poetry2nixSrc = "${sources_.poetry2nix}";
+  # Taken from overlay.nix from poetry2nix, adapted for python310
+  pkgs = import sources_.nixpkgs {
+    overlays = [(final: prev: {
+      poetry2nix = import poetry2nixSrc { pkgs = final; poetry = final.poetry; };
+      poetry = prev.callPackage "${poetry2nixSrc}/pkgs/poetry" { python = final.python310; };
+    })];
+  };
+  python = pkgs.python310;
+  inherit (pkgs) poetry poetry2nix lib;
 
   overrides = poetry2nix.overrides.withDefaults (
     self: super: {
@@ -22,7 +28,7 @@ let
           format = "setuptools";
           buildInputs = old.buildInputs ++ [
             self.coverage
-            poetry
+            self.poetry
           ];
         }
       );
@@ -32,19 +38,13 @@ let
     projectDir = ../.;
     inherit python;
     inherit overrides;
-  }) poetry poetryPackages;
+  }) poetryPackages;
 
   poetryPackagesByName =
     lib.listToAttrs
       (map
         (p: { name = p.pname or "none"; value = p; })
         poetryPackages);
-
-  poetryWrapper = pkgs.writeScriptBin "poetry" ''
-    export PYTHONPATH=
-    unset SOURCE_DATE_EPOCH
-    ${poetry}/bin/poetry "$@"
-  '';
 
 in rec {
   inherit pkgs python poetryPackagesByName;
@@ -83,7 +83,7 @@ in rec {
     pkgs.entr
     pkgs.jq
     pkgs.zsh
-    poetryWrapper
+    poetry
   ];
 
   # Needed for a development nix shell
