@@ -4,7 +4,8 @@ with builtins;
 let
   sources_ = if (sources == null) then import ./sources.nix else sources;
 
-  poetry2nixSrc = "${sources_.poetry2nix}";
+  poetry2nixSrc = ../../poetry2nix;
+  #poetry2nixSrc = "${sources_.poetry2nix}";
   # Taken from overlay.nix from poetry2nix, adapted for python310
   pkgs = import sources_.nixpkgs {
     overlays = [(final: prev: {
@@ -16,7 +17,22 @@ let
   inherit (pkgs) poetry poetry2nix lib;
 
   overrides = poetry2nix.overrides.withDefaults (
-    self: super: {
+    self: super:
+    let
+      pythonBuildDepNameValuePair = deps: pname: {
+        name = pname;
+        value = super.${pname}.overridePythonAttrs (old: {
+          buildInputs = old.buildInputs ++ deps;
+        });
+      };
+
+      addPythonBuildDeps = deps: pnames:
+        lib.listToAttrs
+          (map
+            (pythonBuildDepNameValuePair deps)
+            pnames);
+    in
+    {
       munch = super.munch.overridePythonAttrs (
         old: {
           buildInputs = old.buildInputs ++ [ self.pbr ];
@@ -32,7 +48,12 @@ let
           ];
         }
       );
-    });
+    } //
+    (addPythonBuildDeps
+      [ self.setuptools_scm ]
+      [ "more-babel-i18n" "pdbpp" ])
+
+    );
 
   inherit (poetry2nix.mkPoetryPackages {
     projectDir = ../.;
@@ -70,7 +91,7 @@ in rec {
   in [
     bandit
     black
-    isortWrapper
+    #isortWrapper
     mypy
     pylama
     pylint
