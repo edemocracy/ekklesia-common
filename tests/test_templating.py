@@ -8,7 +8,7 @@ from pytest import fixture
 from ekklesia_common.templating import make_jinja_env
 
 TEST_DATETIME = datetime(2017, 1, 1, 11, 23, 42)
-TEST_DATETIME_FORMATTED = "Jan 1, 2017, 11:23:42 AM"
+TEST_DATETIME_FORMATTED = "Jan 1, 2017, 11:23:42\u202fAM"
 
 
 class JinjaTestContext(jinja2.runtime.Context):

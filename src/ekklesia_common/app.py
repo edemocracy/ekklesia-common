@@ -4,13 +4,14 @@ from functools import cached_property
 
 import morepath
 from eliot import start_task
-from more.babel_i18n import BabelApp
-from more.browser_session import BrowserSessionApp
-from more.forwarded import ForwardedApp
-from more.transaction import TransactionApp
+import more.babel_i18n
+import more.browser_session
+import more.forwarded
+import more.transaction
 from pkg_resources import resource_filename
 from webob.exc import HTTPError
 
+import ekklesia_common
 from ekklesia_common.cell import JinjaCellEnvironment
 from ekklesia_common.cell_app import CellApp
 from ekklesia_common.concept import ConceptApp
@@ -23,18 +24,19 @@ from ekklesia_common.permission import WritePermission
 from ekklesia_common.request import EkklesiaRequest
 from ekklesia_common.templating import make_jinja_env, make_template_loader
 
+
 SQL_PRINT_PREFIX = "sql>"
 
 
 class EkklesiaBrowserApp(
-    BabelApp,
-    BrowserSessionApp,
+    more.babel_i18n.BabelApp,
+    more.browser_session.BrowserSessionApp,
     CellApp,
     ConceptApp,
     EkklesiaAuthApp,
     FormApp,
-    ForwardedApp,
-    TransactionApp,
+    more.forwarded.ForwardedApp,
+    more.transaction.TransactionApp,
 ):
 
     request_class = EkklesiaRequest
@@ -46,6 +48,7 @@ class EkklesiaBrowserApp(
 
     def __init__(self):
         super().__init__()
+        ekklesia_common.morepath_scan_deps()
         template_loader = make_template_loader(
             self.__class__.config, self.__class__.package_name
         )

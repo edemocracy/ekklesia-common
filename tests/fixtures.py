@@ -10,13 +10,19 @@ from pytest import fixture
 from ekklesia_common.app import EkklesiaBrowserApp
 from ekklesia_common.request import EkklesiaRequest
 
+
+import more.babel_i18n
+import more.browser_session
+
 BASEDIR = os.path.dirname(__file__)
 logg = logging.getLogger(__name__)
 
 
 @fixture(scope="session")
 def app():
-    morepath.autoscan()
+    morepath.scan(more.babel_i18n)
+    morepath.scan(more.browser_session)
+    #morepath.autoscan(ignore=["more-babel-i18n", "more-browser-session", "more_babel_i18n", "more_browser_session"])
     EkklesiaBrowserApp.commit()
     app = EkklesiaBrowserApp()
     app.babel_init()

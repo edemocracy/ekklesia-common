@@ -4,7 +4,7 @@ Some debugging extensions for Psycopg2.
 import time
 from dataclasses import dataclass
 
-from decorator import contextmanager
+from contextlib import contextmanager
 from eliot import log_message
 from psycopg2.extensions import connection as _connection
 from psycopg2.extensions import cursor as _cursor
