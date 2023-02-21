@@ -293,6 +293,10 @@ class Cell(metaclass=CellMeta):
         return self.link(self._model, "+edit")
 
     @cached_property
+    def delete_url(self) -> str:
+        return self.link(self._model, '+delete')
+
+    @cached_property
     def new_url(self) -> str:
         return self.link(self._model, "+new")
 

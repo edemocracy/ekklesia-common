@@ -14,5 +14,9 @@ class EditPermission(WritePermission):
     pass
 
 
+class DeletePermission(WritePermission):
+    pass
+
+
 class ViewPermission(Permission):
     pass
