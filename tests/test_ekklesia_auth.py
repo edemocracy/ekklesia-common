@@ -44,7 +44,7 @@ def fake_request_with_session(browser_session):
 def token():
     return {
         "token_type": "bearer",
-        "scope": "test",
+        "scope": "openid",
         "access_token": "access",
         "refresh_token": "refresh",
         "expires_at": time.time() + 100,

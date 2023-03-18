@@ -82,6 +82,7 @@ class EkklesiaAuth:
             auto_refresh_url=self.settings.token_url,
             auto_refresh_kwargs=extra,
             token_updater=self._set_token,
+            scope=self.settings.scopes,
         )
 
     @property
@@ -177,6 +178,7 @@ def ekklesia_auth_setting_section():
         "logout_url": f"{base_url}/logout",
         "display_name": "Ekklesia Login",
         "required_role_for_login": None,
+        "scopes": ["openid"],
     }
 
 
