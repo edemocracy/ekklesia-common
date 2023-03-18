@@ -2,6 +2,7 @@ import dataclasses
 import logging
 from dataclasses import dataclass
 from functools import cached_property, partial
+from json import JSONDecodeError
 from typing import List, Optional
 from urllib.parse import quote, unquote
 
@@ -90,7 +91,14 @@ class EkklesiaAuth:
     @property
     def userinfo(self) -> dict:
         res = self.session.get(self.settings.userinfo_url)
-        return res.json()
+        res.raise_for_status()
+        try:
+            jso = res.json()
+        except JSONDecodeError:
+            logg.error("error decoding userinfo response:\n" + res.text)
+            raise
+
+        return jso
 
     @property
     def data(self) -> EkklesiaAuthData:
