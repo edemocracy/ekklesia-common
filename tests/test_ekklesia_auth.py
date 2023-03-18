@@ -14,7 +14,7 @@ from ekklesia_common.ekklesia_auth import (
     EkklesiaNotAuthorized,
 )
 
-morepath.autoscan()
+#morepath.autoscan()
 
 CLIENT_ID = "client_id_test"
 AUTHORIZATION_URL = "http://id.invalid/oauth2/auth"
