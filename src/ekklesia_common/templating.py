@@ -137,7 +137,7 @@ def make_jinja_env(jinja_environment_class, jinja_options, app):
     }
 
     default_jinja_options = ImmutableDict(
-        extensions=[PugExtension, "jinja2.ext.autoescape", "jinja2.ext.i18n"],
+        extensions=[PugExtension, "jinja2.ext.i18n"],
         autoescape=select_jinja_autoescape,
     )
 

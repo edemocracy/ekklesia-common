@@ -43,11 +43,12 @@ pytest-instafail = "^0.4.2"
 pytest-pspec = "^0.0.4"
 psycopg2 = "^2.9.1"
 better-exceptions = "^0.3.3"
-py-gfm = "^1.0.2"
+py-gfm = { git = "https://github.com/zopieux/py-gfm", rev = "master" }
 WebTest = "^3.0.0"
 pypugjs = "^5.9.11"
 "more.browser-session" = "^23.2.0"
-Markdown = "3.3.7"
+Markdown = "^3.4.1"
+pytz = "^2022.7.1"
 
 [tool.coverage.report]
 skip_covered = true
