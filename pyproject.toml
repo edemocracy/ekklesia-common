@@ -50,6 +50,9 @@ pypugjs = "^5.9.11"
 Markdown = "^3.4.1"
 pytz = "^2022.7.1"
 
+[tool.poetry.group.dev.dependencies]
+doit = "^0.36.0"
+
 [tool.coverage.report]
 skip_covered = true
 # Regexes for lines to exclude from consideration

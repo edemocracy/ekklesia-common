@@ -7,60 +7,54 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-12-30 10:35+0000\n"
+"POT-Creation-Date: 2023-04-09 04:20+0200\n"
 "PO-Revision-Date: 2015-09-06 22:42+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.7.0\n"
+"Generated-By: Babel 2.12.1\n"
 
-#: src/ekklesia_common/concepts/ekklesia_common/templates/index.j2.jade:3
-msgid "warning_development_mode"
-msgstr "Warnung: Entwicklungsmodus: Login ohne Passwort möglich!"
+#: src/ekklesia_common/templating.py:83
+msgid "Yes"
+msgstr "ja"
 
-#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:13
-msgid "link_other"
-msgstr "Zur aktuellen Abstimmung"
+#: src/ekklesia_common/templating.py:85
+msgid "No"
+msgstr "nein"
 
-#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:15
-msgid "faq"
-msgstr "FAQ"
+#: src/ekklesia_common/templating.py:95
+msgid "_"
+msgstr ""
 
-#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:17
-msgid "terms_of_use"
-msgstr "Nutzungsbedingungen"
-
-#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:19
-msgid "imprint"
-msgstr "Impressum"
-
-#: src/ekklesia_common/concepts/ekklesia_common/templates/layout.j2.jade:21
-msgid "source code"
-msgstr "Quellcode"
-
-#: src/ekklesia_common/concepts/ekklesia_common/templates/page_test.j2.jade:11
+#: tests/templates/test.j2.jade:2
 msgid "hello_date"
 msgstr "Hallo, heute ist der %(date)s. Es ist jetzt %(time)s."
 
-#: src/ekklesia_common/concepts/ekklesia_common/templates/page_test.j2.jade:13
-#: src/ekklesia_common/concepts/ekklesia_common/templates/page_test.j2.jade:15
-msgid "hello"
-msgid_plural "hellos"
-msgstr[0] "Hallo"
-msgstr[1] "Hallos"
+#: tests/templates/test.j2.jade:3
+msgid "terms_of_use"
+msgstr "Nutzungsbedingungen"
 
-#: src/ekklesia_common/templating.py:77
-msgid "yes"
-msgstr "ja"
+#~ msgid "warning_development_mode"
+#~ msgstr "Warnung: Entwicklungsmodus: Login ohne Passwort möglich!"
 
-#: src/ekklesia_common/templating.py:79
-msgid "no"
-msgstr "nein"
+#~ msgid "link_other"
+#~ msgstr "Zur aktuellen Abstimmung"
 
-#: src/ekklesia_common/templating.py:88
-msgid "_"
-msgstr ""
+#~ msgid "faq"
+#~ msgstr "FAQ"
+
+#~ msgid "imprint"
+#~ msgstr "Impressum"
+
+#~ msgid "source code"
+#~ msgstr "Quellcode"
+
+#~ msgid "hello"
+#~ msgid_plural "hellos"
+#~ msgstr[0] "Hallo"
+#~ msgstr[1] "Hallos"
+

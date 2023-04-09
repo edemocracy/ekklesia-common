@@ -55,7 +55,16 @@ let
       "py-gfm"
       "pyrepl"
       "pytest-pspec"
-      "wmctrl"])
+      "wmctrl"]) //
+    (addPythonBuildDeps
+      [ self.hatchling ]
+      [ "beautifulsoup4" ]) //
+    (addPythonBuildDeps
+      [ self.greenlet ] [
+        "sqlalchemy"
+        "sqlalchemy-utils"
+        "zope-sqlalchemy"
+     ])
     );
 
   inherit (poetry2nix.mkPoetryPackages {
