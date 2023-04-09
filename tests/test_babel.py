@@ -4,11 +4,11 @@ from ekklesia_common.babel import extract_enums
 
 code = """
 # Line 2
-class FirstEnum(Enum):
+class FirstEnum(StrEnum):
     A = 'a' # comment
     B = 'b/b'
 
-class SecondEnum(Enum):
+class SecondEnum(StrEnum):
     # comment
     C = 'c c'
 

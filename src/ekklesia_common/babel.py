@@ -29,7 +29,7 @@ def is_enum_node(node):
     if not isinstance(node, ast.ClassDef):
         return False
 
-    return any(b.id == "Enum" for b in node.bases)
+    return any(b.id == "StrEnum" for b in node.bases)
 
 
 def translation_from_enum_assignment(enum_name, assignment):
