@@ -1,8 +1,10 @@
 *.pyc
-.settings
+.devenv/
+.direnv/
+.idea
 .project
 .pydevproject
-.idea
+.settings
 *.pot
 *.mo
 dist

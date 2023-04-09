@@ -1,20 +1,10 @@
-{ sources ? null }:
+{ pkgs, poetry2nix, poetry }:
+
 with builtins;
 
 let
-  sources_ = if (sources == null) then import ./sources.nix else sources;
-
-  poetry2nixSrc = ../../poetry2nix;
-  #poetry2nixSrc = "${sources_.poetry2nix}";
-  # Taken from overlay.nix from poetry2nix, adapted for python310
-  pkgs = import sources_.nixpkgs {
-    overlays = [(final: prev: {
-      poetry2nix = import poetry2nixSrc { pkgs = final; inherit (final) poetry; };
-      poetry = prev.callPackage "${poetry2nixSrc}/pkgs/poetry" { python = final.python311; };
-    })];
-  };
   python = pkgs.python311;
-  inherit (pkgs) poetry poetry2nix lib;
+  inherit (pkgs) poetry2nix lib;
 
   overrides = poetry2nix.overrides.withDefaults (
     self: super:
@@ -125,7 +115,6 @@ in rec {
   # Various tools for log files, deps management, running scripts and so on
   shellTools = [
     poetryPackagesByName.eliot-tree
-    pkgs.niv
     pkgs.entr
     pkgs.jq
     pkgs.zsh
