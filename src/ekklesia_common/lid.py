@@ -8,7 +8,7 @@ The second part is a random number (22 bits).
 
 import random
 import time
-from datetime import datetime
+from datetime import datetime, tzinfo, timezone
 from functools import cached_property, total_ordering
 
 import base32_crockford
@@ -83,4 +83,4 @@ class LID:
 
     @cached_property
     def datetime(self) -> datetime:
-        return datetime.fromtimestamp(self.milliseconds / 1000)
+        return datetime.fromtimestamp(self.milliseconds / 1000, tz=timezone.utc)

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from freezegun import freeze_time
 
@@ -10,7 +10,7 @@ def test_from_lid_from_int():
     lid = LID(lid_int)
     assert lid.milliseconds == 1598798586456
     assert lid.repr == "1EGZX4RJR-31TPR"
-    assert lid.datetime == datetime(2020, 8, 30, 14, 43, 6, 456000)
+    assert lid.datetime == datetime(2020, 8, 30, 14, 43, 6, 456000, tzinfo=timezone.utc)
 
 
 def test_create_lid():
