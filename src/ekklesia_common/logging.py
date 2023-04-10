@@ -107,10 +107,15 @@ def _add_exception_data_and_traceback(exc: BaseException):
         }
 
 
-def init_logging():
+def init_logging(output_stream=sys.stdout):
+    root_logger = logging.getLogger()
+
+    if root_logger.handlers:
+        # Already configured, don't do it again.
+        return
+
     eliot.register_exception_extractor(Exception, _add_exception_data_and_traceback)
 
-    root_logger = logging.getLogger()
     root_logger.addHandler(EliotHandler())
     root_logger.setLevel(logging.DEBUG)
     logging.getLogger("morepath.directive").setLevel(logging.INFO)
@@ -118,6 +123,6 @@ def init_logging():
     logging.getLogger("passlib.utils.compat").setLevel(logging.INFO)
     logging.getLogger("parso").setLevel(logging.WARN)
 
-    eliot.to_file(sys.stderr, encoder=EkklesiaLogEncoder)
+    eliot.to_file(output_stream, encoder=EkklesiaLogEncoder)
 
     logging.captureWarnings(True)
