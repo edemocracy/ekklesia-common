@@ -49,6 +49,7 @@ pypugjs = "^5.9.11"
 "more.browser-session" = "^23.2.0"
 Markdown = "^3.4.1"
 pytz = "^2022.7.1"
+attrs = "^22.2.0"
 
 [tool.poetry.group.dev.dependencies]
 doit = "^0.36.0"

@@ -57,8 +57,10 @@ let
       "pytest-pspec"
       "wmctrl"]) //
     (addPythonBuildDeps
-      [ self.hatchling ]
-      [ "beautifulsoup4" ]) //
+    [ self.hatchling ] [ 
+      "beautifulsoup4"
+      "urllib3"
+    ]) //
     (addPythonBuildDeps
       [ self.greenlet ] [
         "sqlalchemy"
