@@ -43,6 +43,9 @@ let
       "more-browser-session"
       "more-babel-i18n"
     ]) //
+    (addPythonBuildDeps [ self.flit-core ] [
+      "colored"
+    ]) //
     (addPythonBuildDeps [ self.setuptools-scm self.setuptools ] [
       "pdbpp"
     ]) //
