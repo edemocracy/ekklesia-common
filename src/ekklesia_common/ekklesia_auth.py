@@ -21,10 +21,7 @@ class EkklesiaNotAuthorized(Exception):
     pass
 
 
-class OAuthToken(Base):
-    __tablename__ = "oauth_token"
-    id = C(Integer, FK("users.id"), primary_key=True)
-    user = rel("User", backref=bref("oauth_token", uselist=False))
+class OAuthTokenMixin:
     token = C(JSON)
     provider = C(Text)
     created_at = C(DateTime, nullable=False, server_default=func.now())
@@ -45,8 +42,7 @@ class EkklesiaAuthData:
 
 
 class EkklesiaAuth:
-    """Wraps the OAuth2 session and provides helpers for Ekklesia ID server API access.
-    """
+    """Wraps the OAuth2 session and provides helpers for Ekklesia ID server API access."""
 
     def __init__(self, settings, token=None, get_token=None, set_token=None):
         self.settings = settings
