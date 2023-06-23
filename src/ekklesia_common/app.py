@@ -69,9 +69,11 @@ def has_write_permission_not_logged_in(identity, model, permission):
 
 @EkklesiaBrowserApp.setting_section(section="browser_session")
 def browser_session_setting_section():
+    """Settings for more.browser_session"""
     return {
         "secret_key": secrets.token_urlsafe(64),
         "cookie_secure": True,
+        "permanent_lifetime": 86400,  # seconds
     }
 
 
