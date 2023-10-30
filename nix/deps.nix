@@ -1,10 +1,11 @@
-{ pkgs, poetry2nix, poetry }:
+{ pkgs, poetry2nix }:
 
 with builtins;
 
 let
   python = pkgs.python311;
-  inherit (pkgs) poetry2nix lib;
+  poetry = (pkgs.poetry.override { python3 = python; });
+  inherit (pkgs) lib;
 
   overrides = poetry2nix.overrides.withDefaults (
     self: super:
@@ -34,7 +35,7 @@ let
           format = "setuptools";
           buildInputs = old.buildInputs ++ [
             self.coverage
-            self.poetry
+            self.poetry-core
           ];
         }
       );
@@ -44,6 +45,7 @@ let
       "more-babel-i18n"
     ]) //
     (addPythonBuildDeps [ self.flit-core ] [
+      "cloudpickle"
       "colored"
     ]) //
     (addPythonBuildDeps [ self.setuptools-scm self.setuptools ] [
