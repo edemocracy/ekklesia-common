@@ -10,6 +10,7 @@ from ekklesia_common.cell import (
     JinjaCellContext,
     JinjaCellEnvironment,
 )
+from tests.fixtures import ATestModel
 
 
 @fixture
@@ -39,14 +40,21 @@ def cell_class(model):
         def __init__(self, content):
             self.content = content
 
+    _model: ATestModel
     _model = model
+
 
     class TestCell(Cell):
         model_properties = ["id", "title"]
         markup_class = DummyMarkup
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
 
-        def _get_cell_class(self, model, view):
-            return self.__class__
+            class FakeApp:
+                def get_cell_class(self, model, view):
+                    return TestCell
+
+            self._app = FakeApp()
 
         def test_url(self):
             return "https://example.com/test"
@@ -64,7 +72,6 @@ def cell_class(model):
         fragment_from_name = Cell.fragment("name")
 
     return TestCell
-
 
 @fixture
 def cell(cell_class, model, request_for_cell):

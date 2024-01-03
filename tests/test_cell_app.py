@@ -1,18 +1,16 @@
 from ekklesia_common.cell import Cell
 from ekklesia_common.cell_app import CellApp
-
-
-class ATestModel:
-    pass
+from tests.fixtures import ATestModel
 
 
 class ATestApp(CellApp):
     pass
 
 
-@ATestApp.cell(ATestModel, "name")
+@ATestApp.cell("name")
 class ATestCell(Cell):
-    pass
+
+    _model: ATestModel
 
 
 def test_get_cell(request_for_cell):

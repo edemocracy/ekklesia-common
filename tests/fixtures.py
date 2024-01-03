@@ -44,10 +44,11 @@ def request_for_cell(app):
         render_template=None,
     )
 
+from munch import Munch
+
+class ATestModel(Munch):
+    pass
 
 @fixture
 def model():
-    class TestModel(Munch):
-        pass
-
-    return TestModel(id=5, title="test", private="secret")
+    return ATestModel(id=5, title="test", private="secret")

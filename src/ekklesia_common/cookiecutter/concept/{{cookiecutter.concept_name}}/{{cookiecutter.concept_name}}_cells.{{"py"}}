@@ -7,8 +7,10 @@ from {{ cookiecutter.app_package }}.permission import CreatePermission, EditPerm
 from .{{ cookiecutter.concept_names }} import {{ cookiecutter.ConceptNames }}
 
 
-@App.cell({{ cookiecutter.ConceptNames }})
+@App.cell()
 class {{ cookiecutter.ConceptNames }}Cell(LayoutCell):
+
+    _model: {{ cookiecutter.ConceptNames }}
 
     def {{ cookiecutter.concept_names }}(self):
         return list(self._model.{{ cookiecutter.concept_names }}(self._request.q))
@@ -20,9 +22,10 @@ class {{ cookiecutter.ConceptNames }}Cell(LayoutCell):
         return self.options.get('show_new_button') and self._request.permitted_for_current_user(self._model, CreatePermission)
 
 
-@App.cell({{ cookiecutter.ConceptName }})
+@App.cell()
 class {{ cookiecutter.ConceptName }}Cell(LayoutCell):
 
+    _model: {{ cookiecutter.ConceptName }}
     # Model attributes included here are available as variables in the template:
     # = name
     # model_properties = ['name']
@@ -31,9 +34,10 @@ class {{ cookiecutter.ConceptName }}Cell(LayoutCell):
         return self.options.get('show_edit_button') and self._request.permitted_for_current_user(self._model, EditPermission)
 
 
-@App.cell({{ cookiecutter.ConceptNames }}, 'new')
+@App.cell()
 class New{{ cookiecutter.ConceptName }}Cell(NewFormCell):
-    pass
+
+    _model: {{ cookiecutter.ConceptNames }}
 
     # def _prepare_form_for_render(self):
         # By default, the form's prepare_for_render() method is called without arguments.
@@ -43,9 +47,10 @@ class New{{ cookiecutter.ConceptName }}Cell(NewFormCell):
         # self._form.prepare_for_render(items)
 
 
-@App.cell({{ cookiecutter.ConceptName }}, 'edit')
+@App.cell()
 class Edit{{ cookiecutter.ConceptName }}Cell(EditFormCell):
-    pass
+
+    _model: {{ cookiecutter.ConceptName }}
 
     # def _prepare_form_for_render(self):
         # By default, all fields from the model as given by to_dict() are passed to the form.

@@ -9,22 +9,12 @@ import jinja2.utils
 from markupsafe import Markup
 from webob import Request
 
-_cell_registry: Dict[Any, "Cell"] = {}
-
-
-def find_cell_by_model_instance(model) -> "Cell":
-    return _cell_registry[model.__class__]
-
-
 class CellMeta(type):
     """
     Registers Cell types that are bound to a Model class.
     """
 
     def __init__(cls, name, bases, attrs, **kwargs):
-        model = getattr(cls, "model", None)
-        if model:
-            _cell_registry[model] = cls
         if "template_prefix" not in cls.__dict__:
             module_path = cls.__module__.split(".")
             if module_path[1] == "concepts":
@@ -80,7 +70,6 @@ class Cell(metaclass=CellMeta):
     Templates can access attributes of the cell and some selected model properties directly.
     """
 
-    model: ClassVar[Any]
     model_properties: Iterable[str] = []
     layout = True
     template_prefix: ClassVar[str]
@@ -156,21 +145,12 @@ class Cell(metaclass=CellMeta):
     def static_url(self, path):
         return os.path.join(self._s.static_files.base_url, path)
 
-    def _get_cell_class(self, model, view_name):
-        # multiple new-style cells can be registered for a model class
-        cell_class = self._app.get_cell_class(model, view_name)
-        # look up old-style cells (only one per model class)
-        if cell_class is None:
-            cell_class = find_cell_by_model_instance(model)
-
-        return cell_class
-
     def cell(self, model, layout: bool = None, view_name="", **options) -> "Cell":
         """Look up a cell by model and create an instance.
         The parent cell is set to self which also means that it will be rendered without
         layout by default.
         """
-        cell_class = self._get_cell_class(model, view_name)
+        cell_class = self._app.get_cell_class(model, view_name)
         return cell_class(
             model=model, request=self._request, layout=layout, parent=self, **options
         )
@@ -330,6 +310,12 @@ class Cell(metaclass=CellMeta):
 
     def __contains__(self, name):
         return name in self.model_properties or hasattr(self, name)
+
+class EditCellMixin(Cell):
+    pass
+
+class NewCellMixin(Cell):
+    pass
 
 
 class JinjaCellContext(jinja2.runtime.Context):
